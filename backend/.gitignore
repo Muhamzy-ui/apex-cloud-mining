@@ -1,0 +1,23 @@
+# Backend .gitignore
+.env
+.env.local
+.env.*.local
+*.pyc
+__pycache__/
+*.sqlite3
+*.db
+db.sqlite3
+.venv/
+venv/
+env/
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+*.log
+/staticfiles/
+/media/
+/check_settings.py
+node_modules/
+.env.production

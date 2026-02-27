@@ -1,0 +1,415 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}Apex Mining Admin{% endblock %}
+
+{% block branding %}
+<div style="
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: #141B2E;
+  border-bottom: 1px solid #2A3346;
+">
+  <!-- Logo -->
+  <div style="
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #1A6FFF, #00C6FF);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  ">
+    <svg viewBox="0 0 24 24" fill="white" width="22" height="22">
+      <path d="M14,4l2.29,2.29l-2.88,2.88l-1.42-1.42L14,4 M2.41,13.41L6,9.83L8.83,12.59l-1.41,1.41L6,12.59l-2.59,2.59L2.41,13.41 M22,11.59L11.59,22L6.41,16.82l1.41-1.41l3.17,3.17l8.59-8.59L22,11.59z"/>
+    </svg>
+  </div>
+  
+  <!-- Text -->
+  <div style="flex: 1; min-width: 0;">
+    <h1 style="
+      font-family: 'DM Sans', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      margin: 0;
+      background: linear-gradient(135deg, #1A6FFF, #00C6FF);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    ">
+      Apex Mining
+    </h1>
+    <p style="
+      font-size: 10px;
+      color: #7A95C0;
+      margin: 2px 0 0 0;
+    ">
+      Admin Dashboard
+    </p>
+  </div>
+</div>
+{% endblock %}
+
+{% block usertools %}
+<div id="user-tools" style="
+  padding: 12px 20px;
+  background: #0A0F1E;
+  border-bottom: 1px solid #2A3346;
+  font-size: 12px;
+  color: #7A95C0;
+">
+  {% if user.is_active and user.is_staff %}
+    <strong style="color: #E8F0FF;">{{ user.get_username }}</strong>
+    <span style="margin: 0 8px;">•</span>
+    <a href="{% url 'admin:password_change' %}" style="color: #1A6FFF; text-decoration: none;">Change password</a>
+    <span style="margin: 0 8px;">•</span>
+    <a href="{% url 'admin:logout' %}" style="color: #FF4D6A; text-decoration: none;">Log out</a>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* APEX MINING ADMIN - MOBILE RESPONSIVE */
+  
+  :root {
+    --apex-dark: #0A0F1E;
+    --apex-navy: #141B2E;
+    --apex-card: #1A2235;
+    --apex-border: #2A3346;
+    --apex-text: #E8F0FF;
+    --apex-muted: #7A95C0;
+    --apex-blue: #1A6FFF;
+    --apex-green: #00D395;
+    --apex-gold: #F5A623;
+    --apex-red: #FF4D6A;
+  }
+  
+  * {
+    font-family: 'DM Sans', sans-serif !important;
+  }
+  
+  body {
+    background: var(--apex-dark) !important;
+    color: var(--apex-text) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* Header */
+  #header {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 100 !important;
+  }
+  
+  /* Breadcrumbs */
+  .breadcrumbs {
+    background: var(--apex-card) !important;
+    border: 1px solid var(--apex-border) !important;
+    border-radius: 12px !important;
+    padding: 10px 16px !important;
+    margin: 12px 16px !important;
+    font-size: 12px !important;
+  }
+  
+  .breadcrumbs a {
+    color: var(--apex-blue) !important;
+  }
+  
+  /* Content */
+  #content {
+    padding: 12px 16px !important;
+  }
+  
+  h1 {
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    color: var(--apex-text) !important;
+    margin: 0 0 16px 0 !important;
+  }
+  
+  /* Modules/Cards */
+  .module {
+    background: var(--apex-card) !important;
+    border: 1px solid var(--apex-border) !important;
+    border-radius: 14px !important;
+    padding: 16px !important;
+    margin-bottom: 16px !important;
+    overflow-x: auto !important;
+  }
+  
+  .module h2 {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    color: var(--apex-text) !important;
+    border-bottom: 1px solid var(--apex-border) !important;
+    padding-bottom: 10px !important;
+    margin-bottom: 12px !important;
+  }
+  
+  /* Tables */
+  table {
+    background: transparent !important;
+    font-size: 13px !important;
+    min-width: 100% !important;
+  }
+  
+  thead th {
+    background: var(--apex-navy) !important;
+    color: var(--apex-muted) !important;
+    font-weight: 600 !important;
+    font-size: 11px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    padding: 10px 8px !important;
+    border: none !important;
+    white-space: nowrap !important;
+  }
+  
+  tbody td {
+    background: var(--apex-card) !important;
+    color: var(--apex-text) !important;
+    padding: 12px 8px !important;
+    border-bottom: 1px solid var(--apex-border) !important;
+  }
+  
+  tbody tr:hover td {
+    background: #212938 !important;
+  }
+  
+  a {
+    color: var(--apex-blue) !important;
+    text-decoration: none !important;
+  }
+  
+  a:hover {
+    color: var(--apex-green) !important;
+  }
+  
+  /* Buttons */
+  .button,
+  input[type="submit"],
+  button,
+  .submit-row input {
+    background: linear-gradient(135deg, var(--apex-blue), #0044DD) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 10px 16px !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    cursor: pointer !important;
+    transition: all 0.2s !important;
+    white-space: nowrap !important;
+  }
+  
+  .button:hover,
+  input[type="submit"]:hover,
+  button:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 16px rgba(26, 111, 255, 0.3) !important;
+  }
+  
+  /* Forms */
+  .form-row {
+    background: var(--apex-card) !important;
+    border: 1px solid var(--apex-border) !important;
+    border-radius: 12px !important;
+    padding: 16px !important;
+    margin-bottom: 12px !important;
+  }
+  
+  label {
+    color: var(--apex-muted) !important;
+    font-weight: 600 !important;
+    font-size: 11px !important;
+    text-transform: uppercase !important;
+    display: block !important;
+    margin-bottom: 6px !important;
+  }
+  
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  textarea,
+  select {
+    background: var(--apex-navy) !important;
+    border: 1px solid var(--apex-border) !important;
+    border-radius: 10px !important;
+    color: var(--apex-text) !important;
+    padding: 10px 12px !important;
+    font-size: 13px !important;
+    width: 100% !important;
+  }
+  
+  input:focus,
+  textarea:focus,
+  select:focus {
+    border-color: var(--apex-blue) !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(26, 111, 255, 0.1) !important;
+  }
+  
+  /* Messages */
+  .messagelist {
+    padding: 0 !important;
+    margin: 12px 16px !important;
+  }
+  
+  .messagelist li {
+    background: var(--apex-card) !important;
+    border-left: 4px solid var(--apex-blue) !important;
+    border-radius: 10px !important;
+    padding: 12px 16px !important;
+    margin-bottom: 10px !important;
+    color: var(--apex-text) !important;
+    list-style: none !important;
+    font-size: 13px !important;
+  }
+  
+  .messagelist li.success {
+    border-left-color: var(--apex-green) !important;
+  }
+  
+  .messagelist li.error {
+    border-left-color: var(--apex-red) !important;
+  }
+  
+  .messagelist li.warning {
+    border-left-color: var(--apex-gold) !important;
+  }
+  
+  /* Actions */
+  .actions {
+    background: var(--apex-card) !important;
+    border: 1px solid var(--apex-border) !important;
+    border-radius: 12px !important;
+    padding: 12px !important;
+    margin-bottom: 12px !important;
+  }
+  
+  .actions label {
+    color: var(--apex-text) !important;
+    font-size: 13px !important;
+  }
+  
+  .actions select {
+    margin: 0 8px !important;
+    min-width: 150px !important;
+  }
+  
+  /* Pagination */
+  .paginator {
+    background: var(--apex-card) !important;
+    border: 1px solid var(--apex-border) !important;
+    border-radius: 12px !important;
+    padding: 10px 16px !important;
+    color: var(--apex-text) !important;
+    font-size: 13px !important;
+  }
+  
+  .paginator a {
+    color: var(--apex-blue) !important;
+    font-weight: 600 !important;
+    padding: 6px 10px !important;
+    border-radius: 6px !important;
+    display: inline-block !important;
+  }
+  
+  .paginator a:hover {
+    background: rgba(26, 111, 255, 0.1) !important;
+  }
+  
+  /* MOBILE RESPONSIVE */
+  @media (max-width: 768px) {
+    .breadcrumbs {
+      font-size: 11px !important;
+      padding: 8px 12px !important;
+      margin: 8px 12px !important;
+    }
+    
+    #content {
+      padding: 8px 12px !important;
+    }
+    
+    .module {
+      padding: 12px !important;
+      border-radius: 12px !important;
+    }
+    
+    .module h2 {
+      font-size: 14px !important;
+    }
+    
+    table {
+      font-size: 12px !important;
+    }
+    
+    thead th {
+      font-size: 10px !important;
+      padding: 8px 6px !important;
+    }
+    
+    tbody td {
+      padding: 10px 6px !important;
+    }
+    
+    .button,
+    input[type="submit"],
+    button {
+      font-size: 12px !important;
+      padding: 8px 12px !important;
+    }
+    
+    .actions {
+      padding: 10px !important;
+    }
+    
+    .actions select {
+      width: 100% !important;
+      margin: 8px 0 !important;
+    }
+    
+    .submit-row {
+      padding: 12px !important;
+    }
+    
+    /* Make table scrollable on mobile */
+    .results {
+      overflow-x: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+    }
+  }
+  
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: var(--apex-navy);
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: var(--apex-border);
+    border-radius: 3px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--apex-muted);
+  }
+</style>
+{% endblock %}

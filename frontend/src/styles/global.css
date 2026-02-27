@@ -1,0 +1,294 @@
+/**
+ * APEX MINING - COMPLETE GLOBAL STYLES
+ * Includes Dark Mode + Light Mode with deep white cards
+ */
+
+/* Import DM Sans font */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+
+/* ===== DARK MODE (default) ===== */
+:root,
+:root[data-theme="dark"] {
+  --apex-dark:    #0A0F1E;
+  --apex-navy:    #141B2E;
+  --apex-card:    #1A2235;
+  --apex-card2:   #212938;
+  --apex-border:  #2A3346;
+  --apex-text:    #E8F0FF;
+  --apex-muted:   #7A95C0;
+  --apex-dim:     #546285;
+  --apex-blue:    #1A6FFF;
+  --apex-green:   #00D395;
+  --apex-gold:    #F5A623;
+  --apex-red:     #FF4D6A;
+  --grad-blue:    linear-gradient(135deg, #1A6FFF 0%, #0099FF 60%, #00C6FF 100%);
+  
+  --shadow-sm:    0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md:    0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-lg:    0 16px 48px rgba(0, 0, 0, 0.6);
+  
+  --font-display: 'DM Sans', -apple-system, sans-serif;
+  --font-body:    'DM Sans', -apple-system, sans-serif;
+  
+  --page-pad:     24px;
+}
+
+/* ===== LIGHT MODE (deep white cards) ===== */
+:root[data-theme="light"] {
+  --apex-dark:    #F8FAFC;     /* Light background */
+  --apex-navy:    #F1F5F9;     /* Lighter sections */
+  --apex-card:    #FFFFFF;     /* DEEP WHITE cards */
+  --apex-card2:   #F8FAFC;     /* Slightly off-white */
+  --apex-border:  #E2E8F0;     /* Light borders */
+  --apex-text:    #1E293B;     /* Dark text */
+  --apex-muted:   #64748B;     /* Muted text */
+  --apex-dim:     #94A3B8;     /* Dimmer text */
+  --apex-blue:    #1A6FFF;     /* Keep blue */
+  --apex-green:   #00D395;     /* Keep green */
+  --apex-gold:    #F5A623;     /* Keep gold */
+  --apex-red:     #FF4D6A;     /* Keep red */
+  --grad-blue:    linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 50%, #BFDBFE 100%);
+  
+  --shadow-sm:    0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md:    0 8px 24px rgba(0, 0, 0, 0.08);
+  --shadow-lg:    0 16px 48px rgba(0, 0, 0, 0.12);
+}
+
+/* ===== BASE STYLES ===== */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--apex-dark);
+  color: var(--apex-text);
+  line-height: 1.6;
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ===== SMOOTH TRANSITIONS ===== */
+* {
+  transition: background-color 0.3s ease, 
+              color 0.3s ease, 
+              border-color 0.3s ease,
+              box-shadow 0.3s ease;
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--apex-navy);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--apex-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--apex-muted);
+}
+
+/* ===== LAYOUT ===== */
+.page-content {
+  padding: 0 var(--page-pad);
+  padding-bottom: 120px !important; /* Space for floating bottom nav */
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== BOTTOM NAV - SHOWS ON ALL DEVICES ===== */
+/* Remove any media query that hides it */
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 767px) {
+  :root {
+    --page-pad: 16px;
+  }
+  
+  .sidebar {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  :root {
+    --page-pad: 20px;
+  }
+}
+
+@media (min-width: 1200px) {
+  :root {
+    --page-pad: 32px;
+  }
+}
+
+/* ===== UTILITY CLASSES ===== */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.font-display { font-family: var(--font-display); }
+.font-body { font-family: var(--font-body); }
+
+.text-blue { color: var(--apex-blue); }
+.text-green { color: var(--apex-green); }
+.text-gold { color: var(--apex-gold); }
+.text-red { color: var(--apex-red); }
+.text-muted { color: var(--apex-muted); }
+
+.bg-card { background: var(--apex-card); }
+.bg-navy { background: var(--apex-navy); }
+.bg-dark { background: var(--apex-dark); }
+
+.rounded-sm { border-radius: 8px; }
+.rounded-md { border-radius: 12px; }
+.rounded-lg { border-radius: 16px; }
+.rounded-xl { border-radius: 20px; }
+.rounded-2xl { border-radius: 24px; }
+.rounded-full { border-radius: 9999px; }
+
+.shadow-sm { box-shadow: var(--shadow-sm); }
+.shadow-md { box-shadow: var(--shadow-md); }
+.shadow-lg { box-shadow: var(--shadow-lg); }
+
+/* ===== FOCUS STATES ===== */
+button:focus,
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(26, 111, 255, 0.1);
+}
+
+/* ===== DISABLED STATES ===== */
+button:disabled,
+input:disabled,
+textarea:disabled,
+select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ===== SELECTION ===== */
+::selection {
+  background: rgba(26, 111, 255, 0.3);
+  color: var(--apex-text);
+}
+
+/* ===== TOASTER CUSTOMIZATION ===== */
+.toast {
+  background: var(--apex-card) !important;
+  color: var(--apex-text) !important;
+  border: 1px solid var(--apex-border) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.toast-success {
+  border-left: 4px solid var(--apex-green) !important;
+}
+
+.toast-error {
+  border-left: 4px solid var(--apex-red) !important;
+}
+
+/* ===== DEEP WHITE CARDS IN LIGHT MODE ===== */
+:root[data-theme="light"] .bg-card,
+:root[data-theme="light"] [style*="background: var(--apex-card)"],
+:root[data-theme="light"] [style*="background:var(--apex-card)"] {
+  background: #FFFFFF !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 
+              0 1px 2px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* ===== INPUT STYLING ===== */
+input,
+textarea,
+select {
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--apex-dim);
+  opacity: 0.7;
+}
+
+/* ===== LINK STYLING ===== */
+a {
+  color: var(--apex-blue);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--apex-green);
+}
+
+/* ===== PREVENT TEXT SELECTION ON BUTTONS ===== */
+button {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
+
+/* ===== ENSURE BOTTOM NAV ALWAYS VISIBLE ===== */
+nav[style*="bottom: 20"] {
+  display: flex !important;
+}

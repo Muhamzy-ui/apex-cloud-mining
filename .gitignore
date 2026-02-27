@@ -1,0 +1,66 @@
+# Root-level .gitignore for entire apex-cloud-mining project
+
+# Environment files (CRITICAL - never commit)
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+*.iml
+
+# OS Specific
+Thumbs.db
+.AppleDouble
+.LSOverride
+
+# Backend
+backend/.venv/
+backend/venv/
+backend/env/
+backend/__pycache__/
+backend/*.pyc
+backend/*.pyo
+backend/*.egg-info/
+backend/dist/
+backend/build/
+backend/*.sqlite3
+backend/db.sqlite3
+backend/media/
+backend/staticfiles/
+backend/.pytest_cache/
+backend/.coverage
+backend/check_settings.py
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.cache/
+frontend/.eslintcache
+frontend/npm-debug.log
+frontend/yarn-error.log
+
+# Logs
+*.log
+logs/
+
+# Misc
+.DS_Store
+.env
+*.pem
+*.key
+
+# Coverage
+.coverage
+htmlcov/
+
+# Test
+.pytest_cache/
+.tox/

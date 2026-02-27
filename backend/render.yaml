@@ -1,0 +1,82 @@
+services:
+  # PostgreSQL Database
+  - type: pserv
+    name: apex-postgres
+    ipAddress: 10.0.0.2
+    plan: free
+    postgresSQLVersion: 15
+
+  # Redis Cache & Celery Broker
+  - type: redis
+    name: apex-redis
+    plan: free
+    ipAddress: 10.0.0.3
+    maxmemoryPolicy: noevict
+
+  # Django Backend
+  - type: web
+    name: apex-backend
+    runtime: python
+    pythonVersion: 3.11
+    plan: free
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate"
+    startCommand: "gunicorn apex_project.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --worker-class sync --timeout 30"
+    
+    # Health check
+    healthCheckPath: /api/v1/auth/me/
+    
+    # Environment variables
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: "your-backend-domain.onrender.com"
+      
+      # Database connection
+      - key: DB_ENGINE
+        value: "django.db.backends.postgresql"
+      - key: DB_NAME
+        value: "apex_db_production"
+      - key: DB_USER
+        value: "apex_user"
+      - key: DB_HOST
+        fromService:
+          type: pserv
+          name: apex-postgres
+          property: host
+      - key: DB_PORT
+        value: "5432"
+      
+      # Redis connection
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: apex-redis
+          property: connectionString
+      
+      # Add other env variables from .env.example
+      # The SECRET_KEY, PAYSTACK_KEY, etc. should be added via Render dashboard
+      
+    # Custom domain
+    domains:
+      - your-api-domain.com
+
+  # Optional: Celery Worker for background tasks
+  - type: background
+    name: apex-celery
+    runtime: python
+    pythonVersion: 3.11
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "celery -A apex_project worker -l info"
+    envVars:
+      - key: CELERY_BROKER_URL
+        fromService:
+          type: redis
+          name: apex-redis
+          property: connectionString
+      - key: CELERY_RESULT_BACKEND
+        fromService:
+          type: redis
+          name: apex-redis
+          property: connectionString
