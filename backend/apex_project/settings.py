@@ -4,15 +4,17 @@ Apex Cloud Mining — Django Settings
 import os
 from pathlib import Path
 from datetime import timedelta
+import dj_database_url
 import environ
+from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(DEBUG=(bool, False))
 environ.Env.read_env(BASE_DIR / '.env')
 
-SECRET_KEY = env('SECRET_KEY', default='apex-dev-secret-key-change-in-production')
-DEBUG = env('DEBUG', default=True)
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['*'])
+SECRET_KEY = config('SECRET_KEY', default='apex-dev-secret-key-change-in-production')
+DEBUG = config('DEBUG', cast=bool, default=True)
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default=['*']).split(',')
 
 INSTALLED_APPS = [
     'apps.users',  
@@ -82,6 +84,7 @@ DATABASES = {
     }
 }
 
+DATABASES['default'] = dj_database_url.parse(config)
 # REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
