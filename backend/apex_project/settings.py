@@ -84,7 +84,7 @@ DATABASES = {
     }
 }
 
-DATABASES['default'] = dj_database_url.parse(config)
+DATABASES['default'] = dj_database_url.parse(config('DATABASE_URL', default='postgres://postgres:Apex123@localhost:5432/apex_db'), conn_max_age=600)
 # REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
