@@ -11,7 +11,7 @@ django-cors-headers==4.9.0
 django-environ==0.12.1
 
 # API Documentation
-drf-spectacular==0.31.0
+drf-spectacular==0.29.0
 
 # Production Server
 gunicorn==23.0.0
