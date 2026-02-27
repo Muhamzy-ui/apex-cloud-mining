@@ -345,4 +345,5 @@ A: Render auto-backs up PostgreSQL daily. Manual backups available in dashboard.
 #   a p e x - m i n i n g  
  #   a p e x - m i n i n g  
  #   a p e x - m i n i n g  
+ #   a p e x - c l o u d - m i n i n g  
  
