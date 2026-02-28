@@ -336,7 +336,8 @@ def verify_account_number(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_nigerian_banks(request):
-    """Get list of Nigerian banks with codes"""
+    """Get list of Nigerian banks with codes for Paystack"""
+    # Paystack CBN Codes for account verification
     banks = [
         {'name': 'Access Bank', 'code': '044'},
         {'name': 'Citibank', 'code': '023'},
@@ -356,10 +357,10 @@ def get_nigerian_banks(request):
         {'name': 'Unity Bank', 'code': '215'},
         {'name': 'Wema Bank', 'code': '035'},
         {'name': 'Zenith Bank', 'code': '057'},
-        {'name': 'Opay', 'code': '999992'},
-        {'name': 'PalmPay', 'code': '999991'},
-        {'name': 'Kuda Bank', 'code': '090267'},
-        {'name': 'Moniepoint', 'code': '090405'},
+        {'name': 'Opay', 'code': '090399'},         # Paycom (OPay)
+        {'name': 'PalmPay', 'code': '100033'},      # PalmPay
+        {'name': 'Kuda Bank', 'code': '090267'},    # Kuda Microfinance Bank
+        {'name': 'Moniepoint', 'code': '090405'},   # Moniepoint MFB
     ]
     
     return Response(banks)
@@ -387,7 +388,9 @@ def get_transactions(request):
                     'status': d.status,
                     'date': d.created_at.isoformat(),
                     'created_at': d.created_at.isoformat(),
-                    'description': f'Plan {d.tier_target} Upgrade'
+                    'description': f'Plan {d.tier_target} Upgrade via {d.get_method_display()}',
+                    'proof_image': request.build_absolute_uri(d.proof_image.url) if d.proof_image else None,
+                    'tx_hash': d.tx_hash,
                 })
         
         # Withdrawals
@@ -404,7 +407,9 @@ def get_transactions(request):
                     'status': w.status,
                     'date': w.created_at.isoformat(),
                     'created_at': w.created_at.isoformat(),
-                    'description': 'Withdrawal Request'
+                    'description': 'Withdrawal Request',
+                    'destination': w.wallet_address if w.method == 'crypto' else f"{w.bank_name} - {w.account_number}",
+                    'tx_id': w.transaction_id,
                 })
         
         # Mining (Earnings)
@@ -422,7 +427,7 @@ def get_transactions(request):
                     'status': 'credited',
                     'date': e.mined_at.isoformat(),
                     'created_at': e.mined_at.isoformat(),
-                    'description': 'Mining Reward'
+                    'description': 'Daily Mining Reward'
                 })
 
         # Withdrawal Fee Payments
@@ -439,7 +444,9 @@ def get_transactions(request):
                     'status': f.status,
                     'date': f.created_at.isoformat(),
                     'created_at': f.created_at.isoformat(),
-                    'description': 'One-time withdrawal fee payment',
+                    'description': f'One-time withdrawal fee payment via {f.get_method_display()}',
+                    'proof_image': request.build_absolute_uri(f.proof_image.url) if f.proof_image else None,
+                    'tx_hash': f.tx_hash,
                 })
         
         # Sort by date
