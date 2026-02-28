@@ -60,6 +60,13 @@ export const WithdrawFeePage = () => {
     fetchPaymentInfo();
   }, [user]);
 
+  // Plan 5 users don't pay transfer fee - redirect them straight back
+  if (Number(user?.tier) >= 5) {
+    toast.success('✨ Plan 5 members have no transfer fee!');
+    setTimeout(() => navigate('/withdraw'), 800);
+    return null;
+  }
+
   // Redirect if already paid
   if (user?.withdrawal_fee_paid) {
     toast.success('✅ Transfer fee already paid!');

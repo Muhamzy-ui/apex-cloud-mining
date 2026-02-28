@@ -209,6 +209,8 @@ export const WithdrawPage = () => {
   const [verifying, setVerifying] = useState(false);
   const [verifiedName, setVerifiedName] = useState('');
   const [showBankDropdown, setShowBankDropdown] = useState(false);
+  const [planTransferFeeUsdt, setPlanTransferFeeUsdt] = useState(0);
+  const [exchangeRate, setExchangeRate] = useState(1600);
 
   // Form state
   const [form, setForm] = useState({
@@ -223,19 +225,27 @@ export const WithdrawPage = () => {
   const withdrawalFeePaid = user?.withdrawal_fee_paid || false;
   const balance = parseFloat(user?.balance_usdt || 0);
   const amount = parseFloat(form.amount) || 0;
+  const userPlan = Number(user?.tier) || 1;
+
+  // Plan 5 users are exempt from transfer fee
+  const isExemptFromFee = userPlan >= 5;
+  const effectiveFeePaid = isExemptFromFee ? true : withdrawalFeePaid;
+
+  // Transfer fee for Transaction Summary
+  const feeNgn = (planTransferFeeUsdt * exchangeRate);
 
   // Safe access to limits
   const minLimit = limits?.min || 10;
   const maxLimit = limits?.max || 10000;
 
   // Eligibility flags
-  const isTier1 = user?.tier === 1;
+  const isTier1 = userPlan === 1;
   const hasMinedTo100 = balance >= 100;
-  const isUpgraded = user?.tier > 1;
+  const isUpgraded = userPlan > 1;
 
-  // Show the tier-lock message when the user is Tier 1, hasn't mined to 100,
+  // Show the tier-lock message when the user is Plan 1, hasn't mined to 100,
   // hasn't upgraded and hasn't already paid the transfer fee.
-  const showTierLockMessage = !withdrawalFeePaid && isTier1 && !hasMinedTo100 && !isUpgraded;
+  const showTierLockMessage = !effectiveFeePaid && isTier1 && !hasMinedTo100 && !isUpgraded;
 
   // Fetch list of Nigerian banks on mount
   useEffect(() => {
@@ -250,6 +260,33 @@ export const WithdrawPage = () => {
     };
     fetchBanks();
   }, []);
+
+  // Fetch user's plan transfer fee and exchange rate
+  useEffect(() => {
+    const fetchPlanFee = async () => {
+      try {
+        const token = localStorage.getItem('access_token');
+        const response = await axios.get(`${API_URL}/mining/tiers/`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const tiers = response.data?.tiers || response.data || [];
+        const userTierObj = tiers.find(t => t.tier_number === userPlan);
+        if (userTierObj) setPlanTransferFeeUsdt(parseFloat(userTierObj.withdrawal_fee_usd || 0));
+      } catch (err) {
+        console.error('Failed to fetch plan fee:', err);
+      }
+    };
+    const fetchRate = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/payments/exchange-rate/`);
+        setExchangeRate(parseFloat(response.data?.usd_to_ngn || 1600));
+      } catch (err) {
+        setExchangeRate(1600);
+      }
+    };
+    fetchPlanFee();
+    fetchRate();
+  }, [userPlan]);
 
   // Fetch withdrawal limits
   useEffect(() => {
@@ -314,7 +351,7 @@ export const WithdrawPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!withdrawalFeePaid) {
+    if (!effectiveFeePaid) {
       toast.error('⚠️ Please pay transfer fee first!');
       setTimeout(() => navigate('/withdraw-fee'), 1500);
       return;
@@ -431,7 +468,7 @@ export const WithdrawPage = () => {
           background: 'linear-gradient(135deg, rgba(255,255,255,0.98), rgba(245,252,255,0.98))',
           border: '1px solid rgba(220,230,235,0.6)',
           borderRadius: '20px',
-          padding: '24px',
+          padding: '20px',
           marginBottom: '20px',
         }}>
           <div style={{
@@ -574,6 +611,7 @@ export const WithdrawPage = () => {
       <div style={{
         opacity: canWithdraw || !showTierLockMessage ? 1 : 0.4,
         pointerEvents: canWithdraw || !showTierLockMessage ? 'auto' : 'none',
+        overflow: 'hidden', // Prevent horizontal bleed on mobile
       }}>
         <div style={{
           background: 'var(--apex-card)',
@@ -1114,8 +1152,10 @@ export const WithdrawPage = () => {
             </div>
 
             {[
-              ['Amount:', `${amount.toFixed(2)} USD = ${(amount * 1600).toLocaleString()} NGN`],
-              ['Transfer Fee:', '0% = 0.00 NGN', 'var(--apex-green)'],
+              ['Amount:', `${amount.toFixed(2)} USD = ${(amount * exchangeRate).toLocaleString('en-NG', { maximumFractionDigits: 0 })} NGN`],
+              isExemptFromFee
+                ? ['Transfer Fee:', 'FREE (Plan 5)', 'var(--apex-green)']
+                : ['Transfer Fee:', `${planTransferFeeUsdt.toFixed(2)} USDT = ${feeNgn.toLocaleString('en-NG', { maximumFractionDigits: 0 })} NGN`, planTransferFeeUsdt > 0 ? 'var(--apex-gold)' : 'var(--apex-green)'],
             ].map(([label, value, color], i) => (
               <div key={i} style={{
                 display: 'flex',
