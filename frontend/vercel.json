@@ -6,7 +6,9 @@
   "env": {
     "VITE_API_URL": "@vite_api_url"
   },
-  "regions": ["sfo1"],
+  "regions": [
+    "sfo1"
+  ],
   "git": {
     "deploymentEnabled": {
       "main": true,
@@ -14,6 +16,14 @@
     }
   },
   "rewrites": [
+    {
+      "source": "/assets/(.*)",
+      "destination": "/assets/$1"
+    },
+    {
+      "source": "/(.*)\\.(.*)",
+      "destination": "/$1.$2"
+    },
     {
       "source": "/(.*)",
       "destination": "/index.html"
