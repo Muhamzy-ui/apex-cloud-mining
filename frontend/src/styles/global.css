@@ -155,27 +155,88 @@ body {
 /* Remove any media query that hides it */
 
 /* ===== RESPONSIVE ===== */
+
+/* --- All Mobile --- */
 @media (max-width: 767px) {
   :root {
     --page-pad: 16px;
   }
-  
   .sidebar {
     display: none !important;
   }
+  /* Prevent horizontal overflow */
+  .page-content {
+    overflow-x: hidden;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  /* Cards stay full width */
+  [style*="borderRadius: 24"],
+  [style*="borderRadius: 20"],
+  [style*="borderRadius: 16"] {
+    border-radius: 16px !important;
+  }
+  /* Large display text scales down */
+  [style*="fontSize: 40"],
+  [style*="fontSize: '40px'"] {
+    font-size: 32px !important;
+  }
+  /* Grid fallback to single column on 1 or 2 col layouts */
+  [style*="gridTemplateColumns: repeat(2"] {
+    grid-template-columns: 1fr 1fr !important;
+  }
 }
 
+/* --- Extra Small Phones (iPhone SE, Galaxy A, < 380px) --- */
+@media (max-width: 380px) {
+  :root {
+    --page-pad: 12px;
+  }
+  .page-content {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  /* Prevent button text overflow */
+  button {
+    font-size: 13px !important;
+  }
+  /* Scale balance card number down */
+  [style*="fontSize: 40"] {
+    font-size: 28px !important;
+  }
+  /* Make grid 1-col on tiny screens */
+  [style*="gridTemplateColumns: 1fr 1fr"] {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  /* Quick action cards stay readable */
+  [style*="flex: 1"][style*="flexDirection: column"] {
+    min-width: 0;
+  }
+}
+
+/* --- Tablet --- */
 @media (min-width: 768px) and (max-width: 1199px) {
   :root {
     --page-pad: 20px;
   }
 }
 
+/* --- Desktop --- */
 @media (min-width: 1200px) {
   :root {
     --page-pad: 32px;
   }
 }
+
+/* --- Prevent overflow in inputs and modals on any size --- */
+input, textarea, select {
+  max-width: 100%;
+}
+[style*="position: 'fixed'"],
+[style*='position: "fixed"'] {
+  max-width: 100vw;
+}
+
 
 /* ===== UTILITY CLASSES ===== */
 .text-center { text-align: center; }

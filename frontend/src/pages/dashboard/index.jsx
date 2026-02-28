@@ -18,21 +18,21 @@ const playNotificationSound = () => {
   try {
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     const notes = [1318.51, 1174.66, 1046.50];
-    
+
     notes.forEach((freq, i) => {
       const osc = audioContext.createOscillator();
       const gain = audioContext.createGain();
-      
+
       osc.connect(gain);
       gain.connect(audioContext.destination);
-      
+
       osc.frequency.value = freq;
       osc.type = 'sine';
-      
+
       const startTime = audioContext.currentTime + i * 0.15;
       gain.gain.setValueAtTime(0.3, startTime);
       gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.15);
-      
+
       osc.start(startTime);
       osc.stop(startTime + 0.15);
     });
@@ -46,11 +46,11 @@ const Ring = ({ seconds }) => {
   const r = 30;
   const circumference = 2 * Math.PI * r;
   const progress = seconds / 86400;
-  
+
   const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
   const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
   const s = String(seconds % 60).padStart(2, '0');
-  
+
   return (
     <div style={{ position: 'relative', width: 72, height: 72 }}>
       <svg viewBox="0 0 72 72" style={{ transform: 'rotate(-90deg)' }}>
@@ -233,8 +233,8 @@ const NotifPanel = ({ onClose }) => {
 /* HOW TO USE GUIDE */
 const HowToUseGuide = () => (
   <Card style={{ marginTop: 20 }}>
-    <SectionTitle>📚 How to Use Apex Cloud Mining</SectionTitle>
-    
+    <SectionTitle>📚 How to Use Apex Mining</SectionTitle>
+
     <div style={{
       background: 'var(--apex-navy)',
       borderRadius: 14,
@@ -307,7 +307,6 @@ const HowToUseGuide = () => (
         display: 'flex',
         alignItems: 'flex-start',
         gap: 12,
-        marginBottom: 16,
       }}>
         <div style={{
           minWidth: 32,
@@ -323,36 +322,6 @@ const HowToUseGuide = () => (
           flexShrink: 0,
         }}>
           3
-        </div>
-        <div>
-          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>
-            Pay Withdrawal Fee (One-Time)
-          </div>
-          <div style={{ fontSize: 13, color: 'var(--apex-muted)', lineHeight: 1.6 }}>
-            Before your first withdrawal, pay a one-time withdrawal fee for your plan. Plan 1 is FREE, higher plans have fees. After approval, you can withdraw anytime.
-          </div>
-        </div>
-      </div>
-
-      <div style={{
-        display: 'flex',
-        alignItems: 'flex-start',
-        gap: 12,
-      }}>
-        <div style={{
-          minWidth: 32,
-          height: 32,
-          background: 'linear-gradient(135deg, #7B2FFF, #A855F7)',
-          borderRadius: 10,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: 16,
-          fontWeight: 800,
-          color: '#fff',
-          flexShrink: 0,
-        }}>
-          4
         </div>
         <div>
           <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>
@@ -535,11 +504,11 @@ export const DashboardPage = () => {
   // Format tier expiry
   const formatTierExpiry = () => {
     if (!tierSeconds || tierSeconds <= 0) return 'Expired';
-    
+
     const days = Math.floor(tierSeconds / 86400);
     const hours = Math.floor((tierSeconds % 86400) / 3600);
     const minutes = Math.floor((tierSeconds % 3600) / 60);
-    
+
     if (days > 0) return `${days}d ${hours}h ${minutes}m`;
     if (hours > 0) return `${hours}h ${minutes}m`;
     return `${minutes}m`;
@@ -618,8 +587,8 @@ export const DashboardPage = () => {
               justifyContent: 'center',
             }}>
               <svg viewBox="0 0 24 24" fill="none" stroke="var(--apex-gold)" strokeWidth="2" width="18" height="18">
-                <circle cx="12" cy="12" r="10"/>
-                <polyline points="12 6 12 12 16 14"/>
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
               </svg>
             </div>
             <div>

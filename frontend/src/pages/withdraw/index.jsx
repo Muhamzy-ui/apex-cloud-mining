@@ -234,12 +234,8 @@ export const WithdrawPage = () => {
   const isUpgraded = user?.tier > 1;
 
   // Show the tier-lock message when the user is Tier 1, hasn't mined to 100,
-  // hasn't upgraded and hasn't already paid the withdrawal fee.
+  // hasn't upgraded and hasn't already paid the transfer fee.
   const showTierLockMessage = !withdrawalFeePaid && isTier1 && !hasMinedTo100 && !isUpgraded;
-
-  // Show the withdrawal fee panel only when the user is eligible to pay the fee
-  // (either upgraded or has mined to >= 100) and hasn't paid yet.
-  const showWithdrawalFeePanel = !withdrawalFeePaid && (isUpgraded || hasMinedTo100);
 
   // Fetch list of Nigerian banks on mount
   useEffect(() => {
@@ -319,7 +315,7 @@ export const WithdrawPage = () => {
     e.preventDefault();
 
     if (!withdrawalFeePaid) {
-      toast.error('⚠️ Please pay withdrawal fee first!');
+      toast.error('⚠️ Please pay transfer fee first!');
       setTimeout(() => navigate('/withdraw-fee'), 1500);
       return;
     }
@@ -462,7 +458,7 @@ export const WithdrawPage = () => {
             color: 'var(--apex-red)',
             marginBottom: '12px',
           }}>
-            Withdrawal Not Available for Tier 1
+            Withdrawal Not Available for Plan 1
           </h3>
 
           <p style={{
@@ -475,8 +471,8 @@ export const WithdrawPage = () => {
           </p>
 
           <ol style={{ marginLeft: '18px', marginBottom: '18px', color: 'var(--apex-muted)', lineHeight: 1.8 }}>
-            <li><strong style={{ color: 'var(--apex-blue)' }}>Accumulate 100 USDT</strong> in your balance and maintain Tier 1 status</li>
-            <li><strong style={{ color: 'var(--apex-blue)' }}>Upgrade to a higher tier</strong> for instant withdrawal</li>
+            <li><strong style={{ color: 'var(--apex-blue)' }}>Accumulate 100 USDT</strong> in your balance and maintain Plan 1 status</li>
+            <li><strong style={{ color: 'var(--apex-blue)' }}>Upgrade to a higher plan</strong> for instant withdrawal</li>
           </ol>
 
           <button
@@ -498,74 +494,7 @@ export const WithdrawPage = () => {
         </div>
       )}
 
-      {showWithdrawalFeePanel && (
-        <div style={{
-          background: 'linear-gradient(135deg, rgba(245,166,35,0.12), rgba(245,166,35,0.08))',
-          border: '1px solid rgba(245,166,35,0.3)',
-          borderRadius: '20px',
-          padding: '24px',
-          marginBottom: '20px',
-        }}>
-          <div style={{
-            width: '56px',
-            height: '56px',
-            background: 'rgba(245,166,35,0.15)',
-            borderRadius: '16px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginBottom: '16px',
-          }}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="var(--apex-gold)" strokeWidth="2" width="28" height="28">
-              <circle cx="12" cy="12" r="10" />
-              <line x1="12" y1="8" x2="12" y2="12" />
-              <line x1="12" y1="16" x2="12.01" y2="16" />
-            </svg>
-          </div>
 
-          <h3 style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '18px',
-            fontWeight: 800,
-            color: 'var(--apex-gold)',
-            marginBottom: '10px',
-          }}>
-            Withdrawal Fee Payment Required
-          </h3>
-
-          <p style={{
-            fontSize: '14px',
-            color: 'var(--apex-muted)',
-            marginBottom: '20px',
-            lineHeight: 1.7,
-          }}>
-            To unlock withdrawals, you need to pay a one-time withdrawal fee. This is required before your first withdrawal.
-          </p>
-
-          <button
-            onClick={() => navigate('/withdraw-fee')}
-            style={{
-              width: '100%',
-              padding: '16px',
-              background: 'linear-gradient(135deg, #CC8800, var(--apex-gold))',
-              border: 'none',
-              borderRadius: '14px',
-              color: '#000',
-              fontFamily: 'var(--font-display)',
-              fontSize: '15px',
-              fontWeight: 700,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              boxShadow: '0 8px 24px rgba(245, 166, 35, 0.3)',
-            }}
-          >
-            💳 Pay Withdrawal Fee
-          </button>
-        </div>
-      )}
 
       {withdrawalFeePaid && !canWithdraw && user?.tier === 1 && (
         <div style={{
@@ -643,8 +572,8 @@ export const WithdrawPage = () => {
       )}
 
       <div style={{
-        opacity: canWithdraw && withdrawalFeePaid ? 1 : 0.4,
-        pointerEvents: canWithdraw && withdrawalFeePaid ? 'auto' : 'none',
+        opacity: canWithdraw || !showTierLockMessage ? 1 : 0.4,
+        pointerEvents: canWithdraw || !showTierLockMessage ? 'auto' : 'none',
       }}>
         <div style={{
           background: 'var(--apex-card)',

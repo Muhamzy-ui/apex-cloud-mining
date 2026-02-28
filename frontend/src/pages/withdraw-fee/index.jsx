@@ -1,5 +1,5 @@
 /**
- * Apex Cloud Mining — Withdrawal Fee Payment Page
+ * Apex Cloud Mining — Transfer Fee Payment Page
  */
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
@@ -62,7 +62,7 @@ export const WithdrawFeePage = () => {
 
   // Redirect if already paid
   if (user?.withdrawal_fee_paid) {
-    toast.success('✅ Withdrawal fee already paid!');
+    toast.success('✅ Transfer fee already paid!');
     setTimeout(() => navigate('/withdraw'), 1000);
     return null;
   }
@@ -110,8 +110,8 @@ export const WithdrawFeePage = () => {
         },
       });
 
-      toast.success('✅ Withdrawal fee payment submitted! Awaiting admin approval.');
-      setTimeout(() => navigate('/dashboard'), 2000);
+      toast.success('✅ Transfer fee payment submitted! Awaiting admin approval.');
+      setTimeout(() => navigate('/withdraw'), 2000);
     } catch (err) {
       console.error('Fee payment error:', err);
       toast.error(err.response?.data?.detail || 'Payment failed');
@@ -152,7 +152,7 @@ export const WithdrawFeePage = () => {
           fontSize: 22,
           fontWeight: 800,
         }}>
-          Pay Withdrawal Fee
+          Pay Transfer Fee
         </h1>
       </div>
 
@@ -178,7 +178,7 @@ export const WithdrawFeePage = () => {
             color: 'var(--apex-muted)',
             lineHeight: 1.7,
           }}>
-            Plan 1 users must mine to <strong>100 USDT</strong> before paying withdrawal fee.
+            Plan 1 users must mine to <strong>100 USDT</strong> before paying transfer fee.
             <br />
             Current balance: <strong>${parseFloat(user?.balance_usdt || 0).toFixed(2)} USDT</strong>
           </p>
@@ -204,7 +204,7 @@ export const WithdrawFeePage = () => {
             marginBottom: '8px',
             fontWeight: 600,
           }}>
-            One-Time Withdrawal Fee
+            One-Time Transfer Fee
           </div>
           <div style={{
             fontSize: '48px',
