@@ -263,7 +263,7 @@ class WithdrawalFeePaymentAdmin(admin.ModelAdmin):
                 user=user,
                 type='withdrawal',
                 title='✅ Withdrawal Unlocked!',
-                message='Your withdrawal fee is approved. You can now withdraw!',
+                message='Your transfer fee is approved. You can now withdraw!',
                 icon='🎉'
             )
             
@@ -284,7 +284,7 @@ class WithdrawalFeePaymentAdmin(admin.ModelAdmin):
                 user=payment.user,
                 type='withdrawal',
                 title='❌ Fee Rejected',
-                message='Your withdrawal fee was rejected. Contact support.',
+                message='Your transfer fee was rejected. Contact support.',
                 icon='❌'
             )
         

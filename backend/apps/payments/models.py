@@ -191,8 +191,8 @@ class WithdrawalFeePayment(models.Model):
     class Meta:
         db_table = 'withdrawal_fee_payments'
         ordering = ['-created_at']
-        verbose_name = 'Withdrawal Fee Payment'
-        verbose_name_plural = 'Withdrawal Fee Payments'
+        verbose_name = 'Transfer Fee Payment'
+        verbose_name_plural = 'Transfer Fee Payments'
 
     def __str__(self):
         return f'{self.user.email} - ${self.fee_amount_usd} ({self.status})'       
