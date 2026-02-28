@@ -9,12 +9,12 @@ import useNotificationStore from '../../context/notificationStore';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8000/api/v1';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
 const PLANS = [
-  { n: 1, name: 'Plan 1', price_usd: 0,      price_ngn: 0,      earn: 1.00,   duration: '100 Days', isFree: true },
-  { n: 2, name: 'Plan 2', price_usd: 16,     price_ngn: 23235,  earn: 50.00,  duration: '14 Days',  isPopular: true },
-  { n: 3, name: 'Plan 3', price_usd: 69.99,  price_ngn: 85000,  earn: 130.00, duration: '14 Days' },
+  { n: 1, name: 'Plan 1', price_usd: 0, price_ngn: 0, earn: 1.00, duration: '100 Days', isFree: true },
+  { n: 2, name: 'Plan 2', price_usd: 16, price_ngn: 23235, earn: 50.00, duration: '14 Days', isPopular: true },
+  { n: 3, name: 'Plan 3', price_usd: 69.99, price_ngn: 85000, earn: 130.00, duration: '14 Days' },
   { n: 4, name: 'Plan 4', price_usd: 235.99, price_ngn: 321264, earn: 399.00, duration: '14 Days' },
   { n: 5, name: 'Plan 5', price_usd: 435.99, price_ngn: 818000, earn: 699.00, duration: '30 Days' },
 ];
@@ -27,7 +27,7 @@ const PayModal = ({ plan, paymentInfo, agentName, onClose }) => {
   const [loading, setLoading] = useState(false);
   const { add } = useNotificationStore();
   const token = localStorage.getItem('access_token');
-  
+
   const copy = (t) => {
     navigator.clipboard.writeText(t);
     toast.success('Copied!');
@@ -48,7 +48,7 @@ const PayModal = ({ plan, paymentInfo, agentName, onClose }) => {
       formData.append('amount_ngn', plan.price_ngn);
       formData.append('method', method);
       formData.append('proof_image', proof);
-      
+
       if (txHash.trim()) {
         formData.append('tx_hash', txHash);
       }
@@ -62,7 +62,7 @@ const PayModal = ({ plan, paymentInfo, agentName, onClose }) => {
 
       toast.success('✅ Payment submitted! Awaiting admin approval.');
       add('⏳', 'Payment Submitted', `Your ${plan.name} upgrade payment has been submitted. Admin will review within 24 hours.`);
-      
+
       onClose();
     } catch (err) {
       console.error('Deposit error:', err);
@@ -117,7 +117,7 @@ const PayModal = ({ plan, paymentInfo, agentName, onClose }) => {
           borderRadius: '2px',
           margin: '0 auto 22px',
         }} />
-        
+
         <h3 style={{
           fontFamily: 'var(--font-display)',
           fontSize: '20px',
@@ -126,7 +126,7 @@ const PayModal = ({ plan, paymentInfo, agentName, onClose }) => {
         }}>
           Upgrade to {plan.name}
         </h3>
-        
+
         {agentName && (
           <p style={{
             fontSize: '13px',
@@ -346,7 +346,7 @@ const PayModal = ({ plan, paymentInfo, agentName, onClose }) => {
         }}>
           {loading ? 'Submitting...' : 'I Have Made Payment ✓'}
         </button>
-        
+
         <button onClick={onClose} style={{
           width: '100%',
           background: 'transparent',
@@ -449,7 +449,7 @@ const PlanCard = ({ plan, currentPlan, onUpgrade }) => {
           <span style={{ fontSize: '14px', color: 'var(--apex-muted)' }}>Period</span>
           <span style={{ fontSize: '14px', fontWeight: 700 }}>{plan.duration}</span>
         </div>
-        
+
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -467,7 +467,7 @@ const PlanCard = ({ plan, currentPlan, onUpgrade }) => {
             ${plan.earn.toFixed(2)} USDT
           </span>
         </div>
-        
+
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -528,8 +528,8 @@ const PlanCard = ({ plan, currentPlan, onUpgrade }) => {
             boxShadow: '0 8px 24px rgba(26,111,255,0.3)',
             transition: 'all 0.2s',
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-1px)')}
-          onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}>
+            onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-1px)')}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}>
             Upgrade to {plan.name}
           </button>
         )}
@@ -555,13 +555,13 @@ export const UpgradePage = () => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('access_token');
-        
+
         // Fetch payment info
         const paymentResponse = await axios.get(`${API_URL}/auth/agent-payment-info/`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         setPaymentInfo(paymentResponse.data);
-        
+
         // Fetch withdrawal fees (admin-configured)
         const feesResponse = await axios.get(`${API_URL}/payments/withdrawal-fees/`);
         if (feesResponse.data && feesResponse.data.fees) {

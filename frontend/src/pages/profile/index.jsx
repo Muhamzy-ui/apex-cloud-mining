@@ -229,37 +229,38 @@ export const ProfilePage = () => {
   const { user, logout, refreshUser } = useAuthStore();
   const { theme, toggleTheme } = useThemeStore();
   const { unreadCount } = useNotificationStore();
-  
+
   const [uploading, setUploading] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
   const fileInputRef = useRef(null);
-  
-  const avatarUrl = user?.avatar 
-    ? `http://localhost:8000${user.avatar}` 
+
+  const BASE_URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api/v1', '') : 'http://localhost:8000';
+  const avatarUrl = user?.avatar
+    ? `${BASE_URL}${user.avatar}`
     : null;
-  
+
   const firstName = user?.full_name ? user.full_name.split(' ')[0] : 'User';
-  
+
   const handlePhotoUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
     if (!file.type.startsWith('image/')) {
       toast.error('Please select an image file');
       return;
     }
-    
+
     if (file.size > 5 * 1024 * 1024) {
       toast.error('Max 5MB');
       return;
     }
-    
+
     setUploading(true);
-    
+
     try {
       const formData = new FormData();
       formData.append('avatar', file);
-      
+
       await authAPI.updateProfile(formData);
       toast.success('Photo updated!');
       await refreshUser();
@@ -314,10 +315,10 @@ export const ProfilePage = () => {
           }}
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="20" height="20">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
           </svg>
-          
+
           {unreadCount() > 0 && (
             <div style={{
               position: 'absolute',
@@ -382,7 +383,7 @@ export const ProfilePage = () => {
                 </span>
               )}
             </div>
-            
+
             {/* Upload Button */}
             <button
               onClick={() => fileInputRef.current?.click()}
@@ -407,12 +408,12 @@ export const ProfilePage = () => {
                 <div style={{ width: 16, height: 16, border: '2px solid white', borderTop: '2px solid transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
               ) : (
                 <svg viewBox="0 0 24 24" fill="white" width="16" height="16">
-                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                  <circle cx="12" cy="13" r="4"/>
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                  <circle cx="12" cy="13" r="4" />
                 </svg>
               )}
             </button>
-            
+
             <input
               ref={fileInputRef}
               type="file"
@@ -421,7 +422,7 @@ export const ProfilePage = () => {
               style={{ display: 'none' }}
             />
           </div>
-          
+
           {/* User info */}
           <h2 style={{
             fontFamily: 'var(--font-display)',
@@ -451,7 +452,7 @@ export const ProfilePage = () => {
             color: 'var(--apex-blue)',
           }}>
             <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
             </svg>
             Plan {user?.tier || 1}
           </div>
@@ -559,7 +560,7 @@ export const ProfilePage = () => {
               fontSize: 14,
               fontWeight: 700,
             }}>
-              {user?.date_joined 
+              {user?.date_joined
                 ? new Date(user.date_joined).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
                 : 'Feb 2026'}
             </div>
@@ -570,7 +571,7 @@ export const ProfilePage = () => {
       {/* Settings Menu */}
       <Card style={{ marginBottom: 20 }}>
         <SectionTitle>Settings</SectionTitle>
-        
+
         {/* Edit Profile */}
         <div
           onClick={() => navigate('/edit-profile')}
@@ -594,8 +595,8 @@ export const ProfilePage = () => {
               justifyContent: 'center',
             }}>
               <svg viewBox="0 0 24 24" fill="none" stroke="var(--apex-blue)" strokeWidth="2" width="20" height="20">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                <circle cx="12" cy="7" r="4"/>
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
               </svg>
             </div>
             <div>
@@ -604,7 +605,7 @@ export const ProfilePage = () => {
             </div>
           </div>
           <svg viewBox="0 0 24 24" fill="none" stroke="var(--apex-muted)" strokeWidth="2" width="18" height="18">
-            <polyline points="9 18 15 12 9 6"/>
+            <polyline points="9 18 15 12 9 6" />
           </svg>
         </div>
 
@@ -631,8 +632,8 @@ export const ProfilePage = () => {
               justifyContent: 'center',
             }}>
               <svg viewBox="0 0 24 24" fill="none" stroke="var(--apex-blue)" strokeWidth="2" width="20" height="20">
-                <rect x="3" y="11" width="18" height="11" rx="2"/>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                <rect x="3" y="11" width="18" height="11" rx="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
               </svg>
             </div>
             <div>
@@ -641,7 +642,7 @@ export const ProfilePage = () => {
             </div>
           </div>
           <svg viewBox="0 0 24 24" fill="none" stroke="var(--apex-muted)" strokeWidth="2" width="18" height="18">
-            <polyline points="9 18 15 12 9 6"/>
+            <polyline points="9 18 15 12 9 6" />
           </svg>
         </div>
 
@@ -667,8 +668,8 @@ export const ProfilePage = () => {
               justifyContent: 'center',
             }}>
               <svg viewBox="0 0 24 24" fill="none" stroke="var(--apex-blue)" strokeWidth="2" width="20" height="20">
-                <circle cx="12" cy="12" r="10"/>
-                <polyline points="12 6 12 12 16 14"/>
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
               </svg>
             </div>
             <div>
@@ -677,7 +678,7 @@ export const ProfilePage = () => {
             </div>
           </div>
           <svg viewBox="0 0 24 24" fill="none" stroke="var(--apex-muted)" strokeWidth="2" width="18" height="18">
-            <polyline points="9 18 15 12 9 6"/>
+            <polyline points="9 18 15 12 9 6" />
           </svg>
         </div>
       </Card>
@@ -734,7 +735,7 @@ export const ProfilePage = () => {
       {/* Theme */}
       <Card style={{ marginBottom: 20 }}>
         <SectionTitle>Appearance</SectionTitle>
-        
+
         <div
           onClick={toggleTheme}
           style={{
@@ -761,7 +762,7 @@ export const ProfilePage = () => {
             }}>
               {theme === 'dark' ? '🌙' : '☀️'}
             </div>
-            
+
             <div>
               <div style={{ fontSize: 14, fontWeight: 600 }}>
                 {theme === 'dark' ? 'Dark Mode' : 'Light Mode'}
@@ -820,9 +821,9 @@ export const ProfilePage = () => {
         }}
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="20" height="20">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-          <polyline points="16 17 21 12 16 7"/>
-          <line x1="21" y1="12" x2="9" y2="12"/>
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" y1="12" x2="9" y2="12" />
         </svg>
         Logout
       </button>
@@ -858,17 +859,17 @@ export const EditProfilePage = () => {
   const [loading, setLoading] = useState(false);
   const [fullName, setFullName] = useState(user?.full_name || '');
   const [phone, setPhone] = useState(user?.phone || '');
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       await authAPI.updateProfile({
         full_name: fullName,
         phone: phone,
       });
-      
+
       toast.success('Profile updated!');
       await refreshUser();
       navigate('/profile');
@@ -903,7 +904,7 @@ export const EditProfilePage = () => {
           }}
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="18" height="18">
-            <polyline points="15 18 9 12 15 6"/>
+            <polyline points="15 18 9 12 15 6" />
           </svg>
         </button>
         <h1 style={{
@@ -1015,25 +1016,25 @@ export const ChangePasswordPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (newPassword !== confirmPassword) {
       toast.error('Passwords do not match');
       return;
     }
-    
+
     if (newPassword.length < 6) {
       toast.error('Password must be at least 6 characters');
       return;
     }
-    
+
     setLoading(true);
-    
+
     try {
       await authAPI.changePassword({
         old_password: oldPassword,
         new_password: newPassword,
       });
-      
+
       toast.success('Password changed!');
       navigate('/profile');
     } catch (err) {
@@ -1092,13 +1093,13 @@ export const ChangePasswordPage = () => {
         >
           {show ? (
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="20" height="20">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-              <circle cx="12" cy="12" r="3"/>
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+              <circle cx="12" cy="12" r="3" />
             </svg>
           ) : (
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="20" height="20">
-              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-              <line x1="1" y1="1" x2="23" y2="23"/>
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+              <line x1="1" y1="1" x2="23" y2="23" />
             </svg>
           )}
         </button>
@@ -1130,7 +1131,7 @@ export const ChangePasswordPage = () => {
           }}
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="18" height="18">
-            <polyline points="15 18 9 12 15 6"/>
+            <polyline points="15 18 9 12 15 6" />
           </svg>
         </button>
         <h1 style={{

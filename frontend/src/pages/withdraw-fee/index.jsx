@@ -8,17 +8,17 @@ import useAuthStore from '../../context/authStore';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8000/api/v1';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
 export const WithdrawFeePage = () => {
   const navigate = useNavigate();
   const { user, refreshUser } = useAuthStore();
-  
+
   const [loading, setLoading] = useState(false);
   const [method, setMethod] = useState('crypto');
   const [feeAmount, setFeeAmount] = useState(0);
   const [paymentInfo, setPaymentInfo] = useState(null);
-  
+
   const [form, setForm] = useState({
     proof_image: null,
     tx_hash: '',
@@ -32,7 +32,7 @@ export const WithdrawFeePage = () => {
         const response = await axios.get(`${API_URL}/mining/tiers/`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
-        
+
         const userTier = response.data.tiers.find(t => t.tier_number === user?.tier);
         if (userTier) {
           setFeeAmount(parseFloat(userTier.withdrawal_fee_usd || 10));
@@ -368,8 +368,8 @@ export const WithdrawFeePage = () => {
             cursor: 'pointer',
             transition: 'all 0.2s',
           }}
-          onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--apex-blue)'}
-          onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--apex-border)'}
+            onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--apex-blue)'}
+            onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--apex-border)'}
           >
             <input
               type="file"
