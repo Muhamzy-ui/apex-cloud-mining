@@ -12,4 +12,5 @@ urlpatterns = [
     path('verify-account/', views.verify_account_number),
     path('banks/', views.get_nigerian_banks),
     path('transactions/', views.get_transactions),
+    path('exchange-rate/', views.get_exchange_rate),
 ]

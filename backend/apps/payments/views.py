@@ -455,3 +455,21 @@ def get_transactions(request):
         import traceback
         traceback.print_exc()
         return Response({'results': [], 'count': 0}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_exchange_rate(request):
+    """Get current USD to NGN exchange rate (admin-controlled)"""
+    try:
+        rate = ExchangeRate.objects.first()
+        if rate:
+            return Response({
+                'usd_to_ngn': float(rate.usd_to_ngn),
+                'usd_to_ghs': float(rate.usd_to_ghs),
+                'updated_at': rate.updated_at.isoformat(),
+            })
+    except Exception:
+        pass
+    # Fallback default
+    return Response({'usd_to_ngn': 1600, 'usd_to_ghs': 15.5})
