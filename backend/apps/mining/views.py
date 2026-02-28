@@ -145,6 +145,7 @@ def get_tiers(request):
         'price_usd': str(t.price_usd),
         'earn_per_24h_usd': str(t.earn_per_24h_usd),
         'duration_days': t.duration_days,
+        'withdrawal_fee_usd': str(t.withdrawal_fee_usd),  # required for transfer fee display
     } for t in tiers]
     
     return Response({'tiers': data})
