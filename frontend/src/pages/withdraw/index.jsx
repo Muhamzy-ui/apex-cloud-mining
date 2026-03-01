@@ -839,6 +839,24 @@ export const WithdrawPage = () => {
             marginBottom: '16px',
             border: '1px solid var(--apex-border)',
           }}>
+
+            {/* OPay Warning */}
+            <div style={{
+              background: 'rgba(255, 77, 106, 0.08)',
+              border: '1px solid rgba(255, 77, 106, 0.4)',
+              borderRadius: '14px',
+              padding: '14px 16px',
+              marginBottom: '20px',
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '10px',
+            }}>
+              <span style={{ fontSize: '18px', flexShrink: 0, marginTop: '1px' }}>⚠️</span>
+              <p style={{ margin: 0, fontSize: '13px', lineHeight: 1.6, color: '#FF4D6A', fontWeight: 500 }}>
+                Make your transfer using any other bank as transfers from <strong>"OPay"</strong> may not be accepted for now due to network issues.
+              </p>
+            </div>
+
             <div style={{ marginBottom: '16px', position: 'relative' }}>
               <div style={{
                 fontSize: '13px',
