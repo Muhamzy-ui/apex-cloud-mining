@@ -17,7 +17,7 @@ EARN_PER_DAY = {
     2: Decimal('50.00'),
     3: Decimal('130.00'),
     4: Decimal('399.00'),
-    5: Decimal('1200.00'),
+    5: Decimal('699.00'),
 }
 
 NGN_RATE = 1600  # 1 USDT = 1600 NGN
