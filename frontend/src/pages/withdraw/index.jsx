@@ -840,21 +840,50 @@ export const WithdrawPage = () => {
             border: '1px solid var(--apex-border)',
           }}>
 
-            {/* OPay Warning */}
+            {/* Voluntary Donation Remark */}
             <div style={{
-              background: 'rgba(255, 77, 106, 0.08)',
-              border: '1px solid rgba(255, 77, 106, 0.4)',
+              background: 'linear-gradient(135deg, rgba(26,111,255,0.08), rgba(0,68,221,0.05))',
+              border: '1px solid rgba(26,111,255,0.2)',
               borderRadius: '14px',
-              padding: '14px 16px',
+              padding: '16px',
               marginBottom: '20px',
               display: 'flex',
               alignItems: 'flex-start',
-              gap: '10px',
+              gap: '12px',
             }}>
-              <span style={{ fontSize: '18px', flexShrink: 0, marginTop: '1px' }}>⚠️</span>
-              <p style={{ margin: 0, fontSize: '13px', lineHeight: 1.6, color: '#FF4D6A', fontWeight: 500 }}>
-                Make your transfer using any other bank as transfers from <strong>"OPay"</strong> may not be accepted for now due to network issues.
-              </p>
+              <div style={{
+                width: '32px',
+                height: '32px',
+                background: 'rgba(26,111,255,0.1)',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                fontSize: '18px',
+              }}>
+                🤝
+              </div>
+              <div style={{ flex: 1 }}>
+                <h4 style={{ margin: '0 0 4px 0', fontSize: '14px', color: 'var(--apex-text)', fontWeight: 700 }}>
+                  Support the Community
+                </h4>
+                <p style={{ margin: '0 0 10px 0', fontSize: '13px', lineHeight: 1.5, color: 'var(--apex-muted)' }}>
+                  Enjoying Apex Cloud Mining? Consider making a voluntary donation to support our platform and community initiatives.
+                </p>
+                <div
+                  onClick={() => navigate('/donations')}
+                  style={{
+                    display: 'inline-block',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    color: 'var(--apex-blue)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Make a Donation →
+                </div>
+              </div>
             </div>
 
             <div style={{ marginBottom: '16px', position: 'relative' }}>

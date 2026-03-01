@@ -254,50 +254,68 @@ const PayModal = ({ plan, paymentInfo, agentName, onClose }) => {
 
         {/* Bank payment */}
         {method === 'bank' && (
-          <div style={{
-            background: 'var(--apex-navy)',
-            borderRadius: '14px',
-            padding: '14px',
-            marginBottom: '16px',
-          }}>
-            {[
-              ['Bank', paymentInfo.bank_name],
-              ['Account Name', paymentInfo.account_name],
-              ['Account No', paymentInfo.account_number],
-              ['Amount', `₦${plan.price_ngn.toLocaleString()}`],
-            ].map(([k, v]) => (
-              <div key={k} style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '9px 0',
-                borderBottom: '1px solid var(--apex-border)',
-              }}>
-                <span style={{ fontSize: '12px', color: 'var(--apex-muted)' }}>{k}</span>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                  <span style={{
-                    fontSize: '13px',
-                    fontWeight: 700,
-                    color: k === 'Amount' ? 'var(--apex-gold)' : 'var(--apex-text)',
-                  }}>
-                    {v}
-                  </span>
-                  {k === 'Account No' && (
-                    <span onClick={() => copy(v)} style={{
-                      fontSize: '10px',
-                      color: 'var(--apex-blue)',
-                      cursor: 'pointer',
-                      background: 'rgba(26,111,255,0.1)',
-                      padding: '2px 6px',
-                      borderRadius: '4px',
+          <>
+            <div style={{
+              background: 'rgba(255, 77, 106, 0.08)',
+              border: '1px solid rgba(255, 77, 106, 0.4)',
+              borderRadius: '14px',
+              padding: '12px 14px',
+              marginBottom: '16px',
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '10px',
+            }}>
+              <span style={{ fontSize: '16px', flexShrink: 0, marginTop: '1px' }}>⚠️</span>
+              <p style={{ margin: 0, fontSize: '12px', lineHeight: 1.5, color: '#FF4D6A', fontWeight: 500 }}>
+                Make your transfer using any other bank as transfers from <strong>"OPay"</strong> may not be accepted for now due to network issues.
+              </p>
+            </div>
+
+            <div style={{
+              background: 'var(--apex-navy)',
+              borderRadius: '14px',
+              padding: '14px',
+              marginBottom: '16px',
+            }}>
+              {[
+                ['Bank', paymentInfo.bank_name],
+                ['Account Name', paymentInfo.account_name],
+                ['Account No', paymentInfo.account_number],
+                ['Amount', `₦${plan.price_ngn.toLocaleString()}`],
+              ].map(([k, v]) => (
+                <div key={k} style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '9px 0',
+                  borderBottom: '1px solid var(--apex-border)',
+                }}>
+                  <span style={{ fontSize: '12px', color: 'var(--apex-muted)' }}>{k}</span>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <span style={{
+                      fontSize: '13px',
+                      fontWeight: 700,
+                      color: k === 'Amount' ? 'var(--apex-gold)' : 'var(--apex-text)',
                     }}>
-                      Copy
+                      {v}
                     </span>
-                  )}
+                    {k === 'Account No' && (
+                      <span onClick={() => copy(v)} style={{
+                        fontSize: '10px',
+                        color: 'var(--apex-blue)',
+                        cursor: 'pointer',
+                        background: 'rgba(26,111,255,0.1)',
+                        padding: '2px 6px',
+                        borderRadius: '4px',
+                      }}>
+                        Copy
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </>
         )}
 
         {/* Upload proof */}
