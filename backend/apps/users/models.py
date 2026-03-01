@@ -216,3 +216,55 @@ class Notification(models.Model):
 
     def __str__(self):
         return f'{self.user.email} - {self.title}'
+
+
+class EmailVerificationCode(models.Model):
+    """Store 6-digit email verification codes"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='verification_codes')
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'email_verification_codes'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.user.email} - {self.code}'
+        
+    def save(self, *args, **kwargs):
+        if not self.expires_at:
+            # Code valid for 15 minutes
+            self.expires_at = timezone.now() + timezone.timedelta(minutes=15)
+        super().save(*args, **kwargs)
+
+    @property
+    def is_expired(self):
+        return timezone.now() > self.expires_at
+
+
+class PasswordResetCode(models.Model):
+    """Store 6-digit password reset codes"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='password_reset_codes')
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'password_reset_codes'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.user.email} - {self.code}'
+        
+    def save(self, *args, **kwargs):
+        if not self.expires_at:
+            # Code valid for 15 minutes
+            self.expires_at = timezone.now() + timezone.timedelta(minutes=15)
+        super().save(*args, **kwargs)
+
+    @property
+    def is_expired(self):
+        return timezone.now() > self.expires_at

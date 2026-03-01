@@ -164,6 +164,10 @@ APEX_USD_TO_GHS_RATE = 15.5
 # For testing/development, realistic mock names are generated automatically
 PAYSTACK_SECRET_KEY = env('PAYSTACK_SECRET_KEY', default=None)
 
+# Resend Email Settings
+RESEND_API_KEY = env('RESEND_API_KEY', default=None)
+EMAIL_FROM = env('EMAIL_FROM', default='apex-mining <no-reply@apex-mining.com>')
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Africa/Lagos'

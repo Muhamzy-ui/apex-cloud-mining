@@ -104,13 +104,13 @@ export const authAPI = {
   // Login - returns tokens
   login: async (credentials) => {
     const response = await apiClient.post('/auth/login/', credentials);
-    
+
     // Save tokens
     if (response.data.access) {
       localStorage.setItem('access_token', response.data.access);
       localStorage.setItem('refresh_token', response.data.refresh);
     }
-    
+
     return response;
   },
 
@@ -142,9 +142,24 @@ export const authAPI = {
   // Change password
   changePassword: (data) => apiClient.post('/auth/change-password/', data),
 
-  // Forgot password
+  // Forgot password (request reset code)
+  requestPasswordReset: (email) =>
+    apiClient.post('/auth/request-password-reset/', { email }),
+
+  // Confirm password reset with code
+  confirmPasswordReset: (data) =>
+    apiClient.post('/auth/confirm-password-reset/', data),
+
+  // Verify email with 6-digit code
+  verifyEmail: (data) => apiClient.post('/auth/verify-email/', data),
+
+  // Resend verification code
+  resendVerification: (email) =>
+    apiClient.post('/auth/resend-verification/', { email }),
+
+  // Legacy (kept for backward compat)
   forgotPassword: (email) =>
-    apiClient.post('/auth/forgot-password/', { email }),
+    apiClient.post('/auth/request-password-reset/', { email }),
 };
 
 // ==========================
@@ -164,12 +179,12 @@ export const paymentsAPI = {
 
   transactions: (type = 'all') =>
     apiClient.get(`/payments/transactions/?type=${type}`),
-  
+
   payWithdrawalFee: (formData) =>
     apiClient.post('/payments/pay-withdrawal-fee/', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     }),
-  
+
   getPaymentSettings: () => apiClient.get('/payments/settings/'),
 };
 

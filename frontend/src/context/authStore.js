@@ -33,7 +33,12 @@ const useAuthStore = create((set, get) => ({
       return { success: true };
     } catch (err) {
       set({ isLoading: false });
-      toast.error(err.response?.data?.detail || 'Login failed');
+      const errData = err.response?.data;
+      // Unverified account — don't show error, let the page handle it
+      if (errData?.unverified) {
+        return { success: false, unverified: true, email: errData.email };
+      }
+      toast.error(errData?.detail || 'Login failed');
       return { success: false };
     }
   },
@@ -71,6 +76,15 @@ const useAuthStore = create((set, get) => ({
     set({ user: null, isAuthenticated: false });
     toast.success('Logged out');
   },
+
+  // Manually hydrate state (used after email verification)
+  setAuth: (user, access, refresh) => {
+    if (access) localStorage.setItem('access_token', access);
+    if (refresh) localStorage.setItem('refresh_token', refresh);
+    set({ user, isAuthenticated: true });
+  },
+
+  setLoading: (val) => set({ isLoading: val }),
 }));
 
 export default useAuthStore;

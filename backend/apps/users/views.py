@@ -6,26 +6,39 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import User, Notification
+import random
+import string
+from django.utils import timezone
+from .models import User, Notification, EmailVerificationCode, PasswordResetCode
 from .serializers import UserSerializer, RegisterSerializer, DashboardSerializer
+from .utils import send_verification_email, send_password_reset_email
 
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register(request):
-    """Register new user"""
+    """Register new user (Requires Email Verification)"""
     serializer = RegisterSerializer(data=request.data)
     
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    # Save user with is_verified=False (if not already handled in serializer)
     user = serializer.save()
-    refresh = RefreshToken.for_user(user)
+    user.is_verified = False
+    user.save(update_fields=['is_verified'])
+    
+    # Generate 6-digit code
+    code = ''.join(random.choices(string.digits, k=6))
+    EmailVerificationCode.objects.create(user=user, code=code)
+    
+    # Send email
+    send_verification_email(user.email, code)
     
     return Response({
-        'access': str(refresh.access_token),
-        'refresh': str(refresh),
-        'user': UserSerializer(user).data
+        'requires_verification': True,
+        'email': user.email,
+        'message': 'Verification code sent to email'
     }, status=status.HTTP_201_CREATED)
 
 
@@ -61,6 +74,12 @@ def login(request):
             {'detail': 'Account disabled'},
             status=status.HTTP_401_UNAUTHORIZED
         )
+        
+    if not user.is_verified:
+        return Response(
+            {'detail': 'Account not verified. Please verify your email.', 'unverified': True, 'email': user.email},
+            status=status.HTTP_403_FORBIDDEN
+        )
     
     refresh = RefreshToken.for_user(user)
     
@@ -69,6 +88,143 @@ def login(request):
         'refresh': str(refresh),
         'user': UserSerializer(user).data
     })
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def verify_email(request):
+    """Verify email with 6-digit code"""
+    email = request.data.get('email', '').strip().lower()
+    code = request.data.get('code', '').strip()
+    
+    if not email or not code:
+        return Response({'detail': 'Email and code required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+    try:
+        user = User.objects.get(email=email)
+        verification = EmailVerificationCode.objects.filter(
+            user=user, code=code, is_used=False
+        ).order_by('-created_at').first()
+        
+        if not verification:
+            return Response({'detail': 'Invalid verification code'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        if verification.is_expired:
+            return Response({'detail': 'Verification code expired'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        # Success
+        user.is_verified = True
+        user.save(update_fields=['is_verified'])
+        verification.is_used = True
+        verification.save(update_fields=['is_used'])
+        
+        # Return login tokens
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            'detail': 'Email verified successfully',
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
+            'user': UserSerializer(user).data
+        })
+        
+    except User.DoesNotExist:
+        return Response({'detail': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def resend_verification(request):
+    """Resend 6-digit verification code"""
+    email = request.data.get('email', '').strip().lower()
+    
+    if not email:
+        return Response({'detail': 'Email required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+    try:
+        user = User.objects.get(email=email)
+        if user.is_verified:
+            return Response({'detail': 'Email already verified'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        # Invalidate previous unused codes
+        EmailVerificationCode.objects.filter(user=user, is_used=False).update(is_used=True)
+        
+        # Generate new 6-digit code
+        code = ''.join(random.choices(string.digits, k=6))
+        EmailVerificationCode.objects.create(user=user, code=code)
+        
+        send_verification_email(user.email, code)
+        
+        return Response({'detail': 'New verification code sent'})
+        
+    except User.DoesNotExist:
+        # Don't reveal if user exists or not for security on this endpoint
+        return Response({'detail': 'New verification code sent'})
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def request_password_reset(request):
+    """Request a password reset code"""
+    email = request.data.get('email', '').strip().lower()
+    
+    if not email:
+        return Response({'detail': 'Email required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+    try:
+        user = User.objects.get(email=email)
+        
+        # Invalidate previous unused codes
+        PasswordResetCode.objects.filter(user=user, is_used=False).update(is_used=True)
+        
+        # Generate new 6-digit code
+        code = ''.join(random.choices(string.digits, k=6))
+        PasswordResetCode.objects.create(user=user, code=code)
+        
+        send_password_reset_email(user.email, code)
+        
+        return Response({'detail': 'Password reset code sent'})
+        
+    except User.DoesNotExist:
+        # Don't reveal user existence
+        return Response({'detail': 'Password reset code sent'})
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def confirm_password_reset(request):
+    """Confirm password reset with code and set new password"""
+    email = request.data.get('email', '').strip().lower()
+    code = request.data.get('code', '').strip()
+    new_password = request.data.get('new_password', '')
+    
+    if not email or not code or not new_password:
+        return Response({'detail': 'Email, code, and new_password required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+    if len(new_password) < 8:
+        return Response({'detail': 'Password must be at least 8 characters'}, status=status.HTTP_400_BAD_REQUEST)
+        
+    try:
+        user = User.objects.get(email=email)
+        reset_entry = PasswordResetCode.objects.filter(
+            user=user, code=code, is_used=False
+        ).order_by('-created_at').first()
+        
+        if not reset_entry:
+            return Response({'detail': 'Invalid or expired reset code'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        if reset_entry.is_expired:
+            return Response({'detail': 'Reset code expired'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        # Success, change password
+        user.set_password(new_password)
+        user.save()
+        reset_entry.is_used = True
+        reset_entry.save(update_fields=['is_used'])
+        
+        return Response({'detail': 'Password reset successfully. You can now log in.'})
+        
+    except User.DoesNotExist:
+        return Response({'detail': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET', 'PATCH'])
