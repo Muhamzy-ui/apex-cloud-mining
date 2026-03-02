@@ -18,7 +18,6 @@ import { WithdrawPage } from './pages/withdraw';
 import { ProfilePage, EditProfilePage, ChangePasswordPage } from './pages/profile';
 import { HistoryPage, ReferralPage } from './pages/history';
 import { WithdrawFeePage } from './pages/withdraw-fee';
-import { DonationsPage } from './pages/donations';
 
 // Components
 import { SupportWidget } from './components/SupportWidget';
@@ -187,14 +186,7 @@ export default function App() {
             </Protected>
           }
         />
-        <Route
-          path="/donations"
-          element={
-            <Protected>
-              <DonationsPage />
-            </Protected>
-          }
-        />
+
 
         {/* Referral signup */}
         <Route path="/ref/:code" element={<Navigate to="/register" replace />} />
