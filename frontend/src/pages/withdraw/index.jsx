@@ -762,50 +762,7 @@ export const WithdrawPage = () => {
             border: '1px solid var(--apex-border)',
           }}>
 
-            {/* Voluntary Donation Remark */}
-            <div style={{
-              background: 'rgba(26,111,255,0.06)',
-              border: '1px solid rgba(26,111,255,0.15)',
-              borderRadius: '12px',
-              padding: '12px 16px',
-              marginBottom: '20px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '12px',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '16px' }}>🤝</span>
-                <span style={{ fontSize: '13px', color: 'var(--apex-muted)', fontWeight: 500 }}>
-                  Remark: <span style={{ color: 'var(--apex-text)', fontWeight: 700 }}>Voluntary Donation</span>
-                </span>
-              </div>
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText('Voluntary Donation');
-                  toast.success('Remark copied!');
-                }}
-                style={{
-                  background: 'rgba(26,111,255,0.1)',
-                  border: 'none',
-                  borderRadius: '6px',
-                  padding: '4px 8px',
-                  color: 'var(--apex-blue)',
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                }}
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="12" height="12">
-                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                </svg>
-                Copy
-              </button>
-            </div>
+
 
             <div style={{
               display: 'flex',
@@ -886,50 +843,7 @@ export const WithdrawPage = () => {
             border: '1px solid var(--apex-border)',
           }}>
 
-            {/* Voluntary Donation Remark */}
-            <div style={{
-              background: 'rgba(26,111,255,0.06)',
-              border: '1px solid rgba(26,111,255,0.15)',
-              borderRadius: '12px',
-              padding: '12px 16px',
-              marginBottom: '20px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '12px',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '16px' }}>🤝</span>
-                <span style={{ fontSize: '13px', color: 'var(--apex-muted)', fontWeight: 500 }}>
-                  Remark: <span style={{ color: 'var(--apex-text)', fontWeight: 700 }}>Voluntary Donation</span>
-                </span>
-              </div>
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText('Voluntary Donation');
-                  toast.success('Remark copied!');
-                }}
-                style={{
-                  background: 'rgba(26,111,255,0.1)',
-                  border: 'none',
-                  borderRadius: '6px',
-                  padding: '4px 8px',
-                  color: 'var(--apex-blue)',
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                }}
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="12" height="12">
-                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                </svg>
-                Copy
-              </button>
-            </div>
+
 
             <div style={{ marginBottom: '16px', position: 'relative' }}>
               <div style={{
