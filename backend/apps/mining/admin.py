@@ -40,6 +40,14 @@ class UserMiningSessionAdmin(admin.ModelAdmin):
     readonly_fields = ['user', 'tier', 'started_at', 'expires_at']
     ordering = ['-started_at']
     
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        if request.user.is_agent or request.user.is_admin:
+            return qs.filter(user__referred_by=request.user)
+        return qs.none()
+    
     def user_email(self, obj):
         return obj.user.email
     user_email.short_description = 'User'
@@ -52,6 +60,14 @@ class MiningEarningAdmin(admin.ModelAdmin):
     search_fields = ['user__email']
     readonly_fields = ['user', 'tier', 'amount_usdt', 'amount_ngn', 'mined_at']
     ordering = ['-mined_at']
+    
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        if request.user.is_agent or request.user.is_admin:
+            return qs.filter(user__referred_by=request.user)
+        return qs.none()
     
     def user_email(self, obj):
         return obj.user.email

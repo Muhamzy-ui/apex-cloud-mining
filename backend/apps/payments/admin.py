@@ -16,8 +16,15 @@ class DepositAdmin(admin.ModelAdmin):
     list_filter = ['status', 'method', 'tier_target', 'created_at']
     search_fields = ['user__email', 'user__full_name']
     readonly_fields = ['id', 'user', 'tier_target', 'amount_usd', 'amount_ngn', 'method', 'proof_image', 'tx_hash', 'status', 'created_at']
-    actions = ['approve_deposits', 'reject_deposits']
     ordering = ['-created_at']
+    
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        if request.user.is_agent or request.user.is_admin:
+            return qs.filter(user__referred_by=request.user)
+        return qs.none()
     
     def user_email(self, obj):
         return obj.user.email
@@ -104,6 +111,24 @@ class DepositAdmin(admin.ModelAdmin):
     
     reject_deposits.short_description = '❌ Reject Deposits'
 
+    def save_model(self, request, obj, form, change):
+        """Handle individual saves from the edit page"""
+        if change and 'status' in form.changed_data:
+            # Recreate a queryset containing just this object to reuse the bulk logic
+            qs = Deposit.objects.filter(pk=obj.pk, status='pending')
+            # Set it back to pending temporarily so the bulk action can process it
+            obj.status = 'pending' 
+            
+            if form.cleaned_data['status'] == 'approved':
+                self.approve_deposits(request, qs)
+            elif form.cleaned_data['status'] == 'rejected':
+                self.reject_deposits(request, qs)
+                
+            # The action methods handle saving, so we just return
+            return
+            
+        super().save_model(request, obj, form, change)
+
 
 @admin.register(Withdrawal)
 class WithdrawalAdmin(admin.ModelAdmin):
@@ -111,8 +136,15 @@ class WithdrawalAdmin(admin.ModelAdmin):
     list_filter = ['status', 'created_at']
     search_fields = ['user__email', 'wallet_address']
     readonly_fields = ['id', 'user', 'amount_usdt', 'amount_ngn', 'wallet_address', 'created_at']
-    actions = ['approve_withdrawals', 'reject_withdrawals']
     ordering = ['-created_at']
+    
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        if request.user.is_agent or request.user.is_admin:
+            return qs.filter(user__referred_by=request.user)
+        return qs.none()
     
     def user_email(self, obj):
         return obj.user.email
@@ -182,6 +214,20 @@ class WithdrawalAdmin(admin.ModelAdmin):
     
     reject_withdrawals.short_description = '❌ Reject Withdrawals'
 
+    def save_model(self, request, obj, form, change):
+        """Handle individual saves from the edit page"""
+        if change and 'status' in form.changed_data:
+            qs = Withdrawal.objects.filter(pk=obj.pk, status='pending')
+            obj.status = 'pending'
+            
+            if form.cleaned_data['status'] == 'approved':
+                self.approve_withdrawals(request, qs)
+            elif form.cleaned_data['status'] == 'rejected':
+                self.reject_withdrawals(request, qs)
+            return
+
+        super().save_model(request, obj, form, change)
+
 
 @admin.register(ExchangeRate)
 class ExchangeRateAdmin(admin.ModelAdmin):
@@ -231,8 +277,15 @@ class WithdrawalFeePaymentAdmin(admin.ModelAdmin):
     list_filter = ['status', 'tier', 'method', 'created_at']
     search_fields = ['user__email']
     readonly_fields = ['id', 'user', 'tier', 'fee_amount_usd', 'method', 'proof_image', 'tx_hash', 'created_at']
-    actions = ['approve_fee_payments', 'reject_fee_payments']
     ordering = ['-created_at']
+    
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        if request.user.is_agent or request.user.is_admin:
+            return qs.filter(user__referred_by=request.user)
+        return qs.none()
     
     def user_email(self, obj):
         return obj.user.email
@@ -291,3 +344,17 @@ class WithdrawalFeePaymentAdmin(admin.ModelAdmin):
         self.message_user(request, f'❌ Rejected {queryset.count()} fees', level=messages.WARNING)
     
     reject_fee_payments.short_description = '❌ Reject Fees'
+
+    def save_model(self, request, obj, form, change):
+        """Handle individual saves from the edit page"""
+        if change and 'status' in form.changed_data:
+            qs = WithdrawalFeePayment.objects.filter(pk=obj.pk, status='pending')
+            obj.status = 'pending'
+            
+            if form.cleaned_data['status'] == 'approved':
+                self.approve_fee_payments(request, qs)
+            elif form.cleaned_data['status'] == 'rejected':
+                self.reject_fee_payments(request, qs)
+            return
+
+        super().save_model(request, obj, form, change)

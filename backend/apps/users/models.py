@@ -98,6 +98,10 @@ class User(AbstractBaseUser, PermissionsMixin):
             self.referral_code = ''.join(
                 random.choices(string.ascii_uppercase + string.digits, k=8)
             )
+            
+        # Automatically grant staff access to agents so they can log into the admin panel
+        if self.is_agent and not self.is_staff:
+            self.is_staff = True
 
         super().save(*args, **kwargs)
 
