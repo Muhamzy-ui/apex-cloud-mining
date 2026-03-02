@@ -11,7 +11,7 @@ import useAuthStore from '../../context/authStore';
 import useNotificationStore from '../../context/notificationStore';
 import toast from 'react-hot-toast';
 
-const EARN_DAY = { 1: 1.00, 2: 50.00, 3: 130.00, 4: 399.00, 5: 1200.00 };
+const EARN_DAY = { 1: 1.00, 2: 50.00, 3: 130.00, 4: 399.00, 5: 699.00 };
 
 // Notification sound
 const playNotificationSound = () => {

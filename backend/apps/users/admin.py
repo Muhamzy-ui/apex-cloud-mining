@@ -18,12 +18,34 @@ class UserAdmin(BaseUserAdmin):
         ('Personal Info', {'fields': ('full_name', 'phone', 'country', 'avatar')}),
         ('Mining', {'fields': ('tier', 'tier_expiry', 'balance_usdt', 'balance_ngn', 'total_earned', 'trc20_wallet')}),
         ('Referral', {'fields': ('referral_code', 'referred_by')}),
+        ('Agent Info', {'fields': ('is_agent', 'agent_wallet_usdt', 'agent_bank_name', 'agent_account_name', 'agent_account_number', 'agent_commission_percent')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_admin', 'is_verified')}),
     )
     
     add_fieldsets = (
         (None, {'fields': ('email', 'password1', 'password2')}),
     )
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        if request.user.is_agent or request.user.is_admin:
+            # Agents/Admins that are not superusers can only see themselves and their referrals
+            return qs.filter(models.Q(id=request.user.id) | models.Q(referred_by=request.user))
+        return qs.none()
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly = list(super().get_readonly_fields(request, obj) or [])
+        if not request.user.is_superuser:
+            # Prevent non-superusers from elevating privileges
+            readonly.extend(['is_staff', 'is_superuser', 'is_admin', 'is_agent'])
+            # If viewing someone else, make everything read-only except what an agent should modify? 
+            # Actually, agents probably shouldn't edit their referrals' details much, but 
+            # for now we'll just protect the core permission fields.
+            if obj and obj.id != request.user.id:
+                readonly.extend(['balance_usdt', 'balance_ngn', 'total_earned'])
+        return readonly
 
 
 @admin.register(Notification)

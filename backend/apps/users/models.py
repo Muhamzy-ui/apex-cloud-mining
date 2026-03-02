@@ -117,9 +117,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     def can_withdraw(self):
         """
         Check if user can withdraw:
-        - All tiers: Must have paid withdrawal fee
-        - Plan 1 only: Must also have 100 USDT minimum
+        - Tier 5: Allowed unconditionally (no withdrawal fee)
+        - Other tiers: Must have paid withdrawal fee
+        - Tier 1 only: Must also have 100 USDT minimum
         """
+        if self.tier == 5:
+            return True
+
         if not self.withdrawal_fee_paid:
             return False
 
