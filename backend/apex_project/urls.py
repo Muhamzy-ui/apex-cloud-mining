@@ -7,12 +7,16 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from django.contrib.auth.views import LogoutView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
 
 urlpatterns = [
+    # Fix for Django 5.x admin logout GET request issue
+    path('django-admin/logout/', LogoutView.as_view(next_page='/django-admin/login/')),
     path('django-admin/', admin.site.urls),
 
     # ==============================

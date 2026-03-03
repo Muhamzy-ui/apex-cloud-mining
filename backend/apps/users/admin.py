@@ -3,6 +3,7 @@ Apex Mining - User Admin (FIXED)
 """
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.db import models
 from .models import User, Notification
 
 
