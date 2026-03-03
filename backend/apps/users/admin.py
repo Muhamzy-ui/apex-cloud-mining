@@ -29,10 +29,10 @@ class UserAdmin(BaseUserAdmin):
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        if request.user.is_superuser:
+        if request.user.is_superuser or request.user.is_admin:
             return qs
-        if request.user.is_agent or request.user.is_admin:
-            # Agents/Admins that are not superusers can only see themselves and their referrals
+        if request.user.is_agent:
+            # Agents that are not admins/superusers can only see themselves and their referrals
             return qs.filter(models.Q(id=request.user.id) | models.Q(referred_by=request.user))
         return qs.none()
 
