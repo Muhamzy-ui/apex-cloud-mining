@@ -16,6 +16,7 @@ class DepositAdmin(admin.ModelAdmin):
     list_filter = ['status', 'method', 'tier_target', 'created_at']
     search_fields = ['user__email', 'user__full_name']
     readonly_fields = ['id', 'user', 'tier_target', 'amount_usd', 'amount_ngn', 'method', 'proof_image', 'tx_hash', 'status', 'created_at']
+    actions = ['approve_deposits', 'reject_deposits']
     ordering = ['-created_at']
     
     def get_queryset(self, request):
@@ -148,6 +149,7 @@ class WithdrawalAdmin(admin.ModelAdmin):
     list_filter = ['status', 'created_at']
     search_fields = ['user__email', 'wallet_address']
     readonly_fields = ['id', 'user', 'amount_usdt', 'amount_ngn', 'wallet_address', 'created_at']
+    actions = ['approve_withdrawals', 'reject_withdrawals']
     ordering = ['-created_at']
     
     def get_queryset(self, request):
@@ -300,6 +302,7 @@ class WithdrawalFeePaymentAdmin(admin.ModelAdmin):
     list_filter = ['status', 'tier', 'method', 'created_at']
     search_fields = ['user__email']
     readonly_fields = ['id', 'user', 'tier', 'fee_amount_usd', 'method', 'proof_image', 'tx_hash', 'created_at']
+    actions = ['approve_fee_payments', 'reject_fee_payments']
     ordering = ['-created_at']
     
     def get_queryset(self, request):
