@@ -38,95 +38,107 @@ class DepositAdmin(admin.ModelAdmin):
         return format_html('<strong>{}</strong>', usd)
     amount_display.short_description = 'Amount'
     
-    def approve_deposits(self, request, queryset):
-        """Approve deposits and upgrade users"""
+    def _process_deposit_approval(self, request, deposit):
+        """Helper to process a single deposit approval"""
         from apps.mining.models import MiningTier, UserMiningSession
         from apps.users.models import Notification
         
-        for deposit in queryset.filter(status='pending'):
-            try:
-                user = deposit.user
-                plan_number = deposit.tier_target
-                
-                # Get plan
-                tier = MiningTier.objects.get(tier_number=plan_number)
-                
-                # Update user
-                user.tier = plan_number
-                user.tier_expiry = timezone.now() + timedelta(days=tier.duration_days) if plan_number > 1 else None
-                user.last_mined_at = None  # Reset so they can mine immediately
-                user.save()
-                
-                # Deactivate old sessions
-                UserMiningSession.objects.filter(user=user, is_active=True).update(is_active=False)
-                
-                # Create new session
-                UserMiningSession.objects.create(
-                    user=user,
-                    tier=plan_number,
-                    started_at=timezone.now(),
-                    expires_at=user.tier_expiry,
-                    is_active=True
-                )
-                
-                # Approve deposit
-                deposit.status = 'approved'
-                deposit.reviewed_at = timezone.now()
-                deposit.save()
-                
-                # Notify user
-                Notification.objects.create(
-                    user=user,
-                    type='tier',
-                    title=f'🎉 Upgraded to {tier.name}!',
-                    message=f'Your {tier.name} is active! Earn ${float(tier.earn_per_24h_usd):.2f} daily.',
-                    icon='✅'
-                )
-                
-                self.message_user(request, f'✅ {user.email} → Plan {plan_number}', level=messages.SUCCESS)
-                
-            except Exception as e:
-                self.message_user(request, f'❌ {str(e)}', level=messages.ERROR)
-    
-    approve_deposits.short_description = '✅ Approve & Upgrade Users'
-    
-    def reject_deposits(self, request, queryset):
-        """Reject deposits"""
-        from apps.users.models import Notification
-        
-        for deposit in queryset.filter(status='pending'):
-            deposit.status = 'rejected'
+        try:
+            user = deposit.user
+            plan_number = deposit.tier_target
+            
+            tier = MiningTier.objects.get(tier_number=plan_number)
+            
+            user.tier = plan_number
+            user.tier_expiry = timezone.now() + timedelta(days=tier.duration_days) if plan_number > 1 else None
+            user.last_mined_at = None
+            user.save()
+            
+            UserMiningSession.objects.filter(user=user, is_active=True).update(is_active=False)
+            
+            UserMiningSession.objects.create(
+                user=user,
+                tier=plan_number,
+                started_at=timezone.now(),
+                expires_at=user.tier_expiry,
+                is_active=True
+            )
+            
+            deposit.status = 'approved'
             deposit.reviewed_at = timezone.now()
             deposit.save()
             
             Notification.objects.create(
-                user=deposit.user,
-                type='deposit',
-                title='❌ Deposit Rejected',
-                message='Your deposit was rejected. Contact support.',
-                icon='❌'
+                user=user,
+                type='tier',
+                title=f'🎉 Upgraded to {tier.name}!',
+                message=f'Your {tier.name} is active! Earn ${float(tier.earn_per_24h_usd):.2f} daily.',
+                icon='✅'
             )
+            return True, f'✅ {user.email} → Plan {plan_number}'
+        except Exception as e:
+            return False, f'❌ {str(e)}'
+
+    def _process_deposit_rejection(self, request, deposit):
+        """Helper to process a single deposit rejection"""
+        from apps.users.models import Notification
         
-        self.message_user(request, f'❌ Rejected {queryset.count()} deposits', level=messages.WARNING)
+        deposit.status = 'rejected'
+        deposit.reviewed_at = timezone.now()
+        deposit.save()
+        
+        Notification.objects.create(
+            user=deposit.user,
+            type='deposit',
+            title='❌ Deposit Rejected',
+            message='Your deposit was rejected. Contact support.',
+            icon='❌'
+        )
+        return True, 'Rejected'
+
+    def approve_deposits(self, request, queryset):
+        """Approve deposits and upgrade users"""
+        success_count = 0
+        for deposit in queryset.filter(status='pending'):
+            success, msg = self._process_deposit_approval(request, deposit)
+            if success:
+                success_count += 1
+                self.message_user(request, msg, level=messages.SUCCESS)
+            else:
+                self.message_user(request, msg, level=messages.ERROR)
+    approve_deposits.short_description = '✅ Approve & Upgrade Users'
     
+    def reject_deposits(self, request, queryset):
+        """Reject deposits"""
+        count = 0
+        for deposit in queryset.filter(status='pending'):
+            success, _ = self._process_deposit_rejection(request, deposit)
+            if success: count += 1
+        self.message_user(request, f'❌ Rejected {count} deposits', level=messages.WARNING)
     reject_deposits.short_description = '❌ Reject Deposits'
 
     def save_model(self, request, obj, form, change):
         """Handle individual saves from the edit page"""
         if change and 'status' in form.changed_data:
-            # Recreate a queryset containing just this object to reuse the bulk logic
-            qs = Deposit.objects.filter(pk=obj.pk, status='pending')
-            # Set it back to pending temporarily so the bulk action can process it
-            obj.status = 'pending' 
-            
-            if form.cleaned_data['status'] == 'approved':
-                self.approve_deposits(request, qs)
-            elif form.cleaned_data['status'] == 'rejected':
-                self.reject_deposits(request, qs)
-                
-            # The action methods handle saving, so we just return
-            return
-            
+            # We must process it using the helper instead of the bulk queryset
+            # First, check if the *original* database state was pending.
+            # We don't want to re-approve an already approved item.
+            original_obj = Deposit.objects.get(pk=obj.pk)
+            if original_obj.status == 'pending':
+                target_status = form.cleaned_data['status']
+                if target_status == 'approved':
+                    success, msg = self._process_deposit_approval(request, obj)
+                    if success:
+                        self.message_user(request, msg, level=messages.SUCCESS)
+                    else:
+                        self.message_user(request, msg, level=messages.ERROR)
+                    return # the helper saves the object
+                elif target_status == 'rejected':
+                    self._process_deposit_rejection(request, obj)
+                    self.message_user(request, f'❌ Deposit rejected', level=messages.WARNING)
+                    return # the helper saves the object
+        
+        # If no status change from pending, just save normally
         super().save_model(request, obj, form, change)
 
 
@@ -158,73 +170,84 @@ class WithdrawalAdmin(admin.ModelAdmin):
         return format_html('<strong>{}</strong>', usd)
     amount_display.short_description = 'Amount'
     
-    def approve_withdrawals(self, request, queryset):
-        """Approve withdrawals and deduct balance"""
+    def _process_withdrawal_approval(self, request, withdrawal):
         from apps.users.models import Notification
+        user = withdrawal.user
         
-        for withdrawal in queryset.filter(status='pending'):
-            user = withdrawal.user
+        if user.balance_usdt >= withdrawal.amount_usdt:
+            user.balance_usdt -= Decimal(str(withdrawal.amount_usdt))
+            if withdrawal.amount_ngn:
+                user.balance_ngn -= Decimal(str(withdrawal.amount_ngn))
+            user.save()
             
-            # Check balance
-            if user.balance_usdt >= withdrawal.amount_usdt:
-                # Deduct balance
-                user.balance_usdt -= Decimal(str(withdrawal.amount_usdt))
-                if withdrawal.amount_ngn:
-                    user.balance_ngn -= Decimal(str(withdrawal.amount_ngn))
-                user.save()
-                
-                # Mark as approved
-                withdrawal.status = 'approved'
-                withdrawal.reviewed_at = timezone.now()
-                withdrawal.save()
-                
-                # Create notification
-                Notification.objects.create(
-                    user=user,
-                    type='withdrawal',
-                    title='💸 Withdrawal Approved!',
-                    message=f'Your withdrawal of ${float(withdrawal.amount_usdt):.2f} USDT has been approved.',
-                    icon='✅'
-                )
-                
-                self.message_user(request, f'✅ Approved {user.email}', level=messages.SUCCESS)
-            else:
-                self.message_user(request, f'❌ {user.email} has insufficient balance!', level=messages.ERROR)
-    
-    approve_withdrawals.short_description = '✅ Approve Withdrawals'
-    
-    def reject_withdrawals(self, request, queryset):
-        """Reject withdrawals"""
-        from apps.users.models import Notification
-        
-        for withdrawal in queryset.filter(status='pending'):
-            withdrawal.status = 'rejected'
+            withdrawal.status = 'approved'
             withdrawal.reviewed_at = timezone.now()
             withdrawal.save()
             
             Notification.objects.create(
-                user=withdrawal.user,
+                user=user,
                 type='withdrawal',
-                title='❌ Withdrawal Rejected',
-                message='Your withdrawal request was rejected. Contact support.',
-                icon='❌'
+                title='💸 Withdrawal Approved!',
+                message=f'Your withdrawal of ${float(withdrawal.amount_usdt):.2f} USDT has been approved.',
+                icon='✅'
             )
+            return True, f'✅ Approved {user.email}'
+        else:
+            return False, f'❌ {user.email} has insufficient balance!'
+
+    def _process_withdrawal_rejection(self, request, withdrawal):
+        from apps.users.models import Notification
+        withdrawal.status = 'rejected'
+        withdrawal.reviewed_at = timezone.now()
+        withdrawal.save()
         
-        self.message_user(request, f'❌ Rejected {queryset.count()} withdrawals', level=messages.WARNING)
+        Notification.objects.create(
+            user=withdrawal.user,
+            type='withdrawal',
+            title='❌ Withdrawal Rejected',
+            message='Your withdrawal request was rejected. Contact support.',
+            icon='❌'
+        )
+        return True, 'Rejected'
+
+    def approve_withdrawals(self, request, queryset):
+        """Approve withdrawals and deduct balance"""
+        success_count = 0
+        for withdrawal in queryset.filter(status='pending'):
+            success, msg = self._process_withdrawal_approval(request, withdrawal)
+            if success:
+                success_count += 1
+                self.message_user(request, msg, level=messages.SUCCESS)
+            else:
+                self.message_user(request, msg, level=messages.ERROR)
+    approve_withdrawals.short_description = '✅ Approve Withdrawals'
     
+    def reject_withdrawals(self, request, queryset):
+        """Reject withdrawals"""
+        count = 0
+        for withdrawal in queryset.filter(status='pending'):
+            success, _ = self._process_withdrawal_rejection(request, withdrawal)
+            if success: count += 1
+        self.message_user(request, f'❌ Rejected {count} withdrawals', level=messages.WARNING)
     reject_withdrawals.short_description = '❌ Reject Withdrawals'
 
     def save_model(self, request, obj, form, change):
         """Handle individual saves from the edit page"""
         if change and 'status' in form.changed_data:
-            qs = Withdrawal.objects.filter(pk=obj.pk, status='pending')
-            obj.status = 'pending'
-            
-            if form.cleaned_data['status'] == 'approved':
-                self.approve_withdrawals(request, qs)
-            elif form.cleaned_data['status'] == 'rejected':
-                self.reject_withdrawals(request, qs)
-            return
+            original_obj = Withdrawal.objects.get(pk=obj.pk)
+            if original_obj.status == 'pending':
+                target_status = form.cleaned_data['status']
+                if target_status == 'approved':
+                    success, msg = self._process_withdrawal_approval(request, obj)
+                    if success:
+                        self.message_user(request, msg, level=messages.SUCCESS)
+                    else:
+                        self.message_user(request, msg, level=messages.ERROR)
+                    return
+                elif target_status == 'rejected':
+                    self._process_withdrawal_rejection(request, obj)
+                    self.message_user(request, f'❌ Withdrawal rejected', level=messages.WARNING)
+                    return
 
         super().save_model(request, obj, form, change)
 
@@ -295,66 +318,76 @@ class WithdrawalFeePaymentAdmin(admin.ModelAdmin):
         return f'${float(obj.fee_amount_usd):.2f}'
     fee_display.short_description = 'Fee'
     
+    def _process_fee_approval(self, request, payment):
+        from apps.users.models import Notification
+        user = payment.user
+        
+        payment.status = 'approved'
+        payment.reviewed_at = timezone.now()
+        payment.save()
+        
+        user.withdrawal_fee_paid = True
+        user.save()
+        
+        Notification.objects.create(
+            user=user,
+            type='withdrawal',
+            title='✅ Withdrawal Unlocked!',
+            message='Your transfer fee is approved. You can now withdraw!',
+            icon='🎉'
+        )
+        return True, f'✅ {user.email} - Withdrawals unlocked!'
+
+    def _process_fee_rejection(self, request, payment):
+        from apps.users.models import Notification
+        payment.status = 'rejected'
+        payment.reviewed_at = timezone.now()
+        payment.save()
+        
+        Notification.objects.create(
+            user=payment.user,
+            type='withdrawal',
+            title='❌ Fee Rejected',
+            message='Your transfer fee was rejected. Contact support.',
+            icon='❌'
+        )
+        return True, 'Rejected'
+
     def approve_fee_payments(self, request, queryset):
         """Approve withdrawal fees and unlock withdrawals"""
-        from apps.users.models import Notification
-        
+        count = 0
         for payment in queryset.filter(status='pending'):
-            user = payment.user
-            
-            # Approve payment
-            payment.status = 'approved'
-            payment.reviewed_at = timezone.now()
-            payment.save()
-            
-            # UNLOCK WITHDRAWALS
-            user.withdrawal_fee_paid = True
-            user.save()
-            
-            # Notify
-            Notification.objects.create(
-                user=user,
-                type='withdrawal',
-                title='✅ Withdrawal Unlocked!',
-                message='Your transfer fee is approved. You can now withdraw!',
-                icon='🎉'
-            )
-            
-            self.message_user(request, f'✅ {user.email} - Withdrawals unlocked!', level=messages.SUCCESS)
-    
+            success, msg = self._process_fee_approval(request, payment)
+            if success:
+                count += 1
+                self.message_user(request, msg, level=messages.SUCCESS)
+        if count > 0:
+            self.message_user(request, f'Approved {count} fees.', level=messages.SUCCESS)
     approve_fee_payments.short_description = '✅ Approve & Unlock Withdrawals'
     
     def reject_fee_payments(self, request, queryset):
         """Reject withdrawal fees"""
-        from apps.users.models import Notification
-        
+        count = 0
         for payment in queryset.filter(status='pending'):
-            payment.status = 'rejected'
-            payment.reviewed_at = timezone.now()
-            payment.save()
-            
-            Notification.objects.create(
-                user=payment.user,
-                type='withdrawal',
-                title='❌ Fee Rejected',
-                message='Your transfer fee was rejected. Contact support.',
-                icon='❌'
-            )
-        
-        self.message_user(request, f'❌ Rejected {queryset.count()} fees', level=messages.WARNING)
-    
+            success, _ = self._process_fee_rejection(request, payment)
+            if success: count += 1
+        self.message_user(request, f'❌ Rejected {count} fees', level=messages.WARNING)
     reject_fee_payments.short_description = '❌ Reject Fees'
 
     def save_model(self, request, obj, form, change):
         """Handle individual saves from the edit page"""
         if change and 'status' in form.changed_data:
-            qs = WithdrawalFeePayment.objects.filter(pk=obj.pk, status='pending')
-            obj.status = 'pending'
-            
-            if form.cleaned_data['status'] == 'approved':
-                self.approve_fee_payments(request, qs)
-            elif form.cleaned_data['status'] == 'rejected':
-                self.reject_fee_payments(request, qs)
-            return
+            original_obj = WithdrawalFeePayment.objects.get(pk=obj.pk)
+            if original_obj.status == 'pending':
+                target_status = form.cleaned_data['status']
+                if target_status == 'approved':
+                    success, msg = self._process_fee_approval(request, obj)
+                    if success:
+                        self.message_user(request, msg, level=messages.SUCCESS)
+                    return
+                elif target_status == 'rejected':
+                    self._process_fee_rejection(request, obj)
+                    self.message_user(request, f'❌ Fee payment rejected', level=messages.WARNING)
+                    return
 
         super().save_model(request, obj, form, change)
