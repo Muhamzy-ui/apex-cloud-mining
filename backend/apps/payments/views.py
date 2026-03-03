@@ -159,11 +159,30 @@ def get_withdrawal_limits(request):
 def get_payment_settings(request):
     """Get payment settings including support links"""
     settings = PaymentSettings.get_settings()
+    
+    usdt_wallet = settings.usdt_wallet
+    bank_name = settings.bank_name
+    account_name = settings.account_name
+    account_number = settings.account_number
+
+    # Override with agent details if user is authenticated and referred by an agent
+    if request.user.is_authenticated and request.user.referred_by:
+        agent = request.user.referred_by
+        if agent.is_agent or agent.is_admin:
+            if agent.agent_wallet_usdt:
+                usdt_wallet = agent.agent_wallet_usdt
+            if agent.agent_bank_name:
+                bank_name = agent.agent_bank_name
+            if agent.agent_account_name:
+                account_name = agent.agent_account_name
+            if agent.agent_account_number:
+                account_number = agent.agent_account_number
+
     return Response({
-        'usdt_wallet': settings.usdt_wallet,
-        'bank_name': settings.bank_name,
-        'account_name': settings.account_name,
-        'account_number': settings.account_number,
+        'usdt_wallet': usdt_wallet,
+        'bank_name': bank_name,
+        'account_name': account_name,
+        'account_number': account_number,
         'support_url': settings.support_url,
         'support_alt_url': settings.support_alt_url,
     })
