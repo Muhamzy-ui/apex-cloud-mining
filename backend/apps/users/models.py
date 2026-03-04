@@ -51,6 +51,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     # Referral System
     referral_code = models.CharField(max_length=8, unique=True, blank=True)
+    referral_code_used = models.CharField(
+        max_length=8,
+        blank=True,
+        verbose_name='Referral Code Used at Signup'
+    )  # Immutable audit field — the exact code typed at registration
     referred_by = models.ForeignKey(
         'self',
         on_delete=models.SET_NULL,

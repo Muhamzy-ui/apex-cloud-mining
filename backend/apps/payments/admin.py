@@ -76,9 +76,70 @@ class DepositAdmin(admin.ModelAdmin):
                 message=f'Your {tier.name} is active! Earn ${float(tier.earn_per_24h_usd):.2f} daily.',
                 icon='✅'
             )
+
+            # --- Credit referral commission ---
+            self._credit_referral_commission(user, deposit)
+
             return True, f'✅ {user.email} → Plan {plan_number}'
         except Exception as e:
             return False, f'❌ {str(e)}'
+
+    def _credit_referral_commission(self, user, deposit):
+        """Atomically credit commission to the user's referrer (if applicable).
+        
+        Uses F() to prevent race conditions.
+        unique_together on (deposit, referrer) prevents double-crediting.
+        """
+        from apps.referrals.models import ReferralCommission, AdminCommissionSummary
+        from apps.users.models import Notification
+        from django.db.models import F
+
+        referrer = user.referred_by
+        if not referrer:
+            return
+
+        # Only active agent/admin referrers earn commissions
+        if not (referrer.is_agent or referrer.is_admin) or not referrer.is_active:
+            return
+
+        # Idempotency guard (also enforced at DB level via unique_together)
+        if ReferralCommission.objects.filter(deposit=deposit, referrer=referrer).exists():
+            return
+
+        commission_pct = referrer.agent_commission_percent
+        commission_amt = Decimal(str(deposit.amount_usd)) * (commission_pct / 100)
+
+        # 1. Record commission
+        ReferralCommission.objects.create(
+            referrer=referrer,
+            referee=user,
+            deposit=deposit,
+            commission_pct=commission_pct,
+            amount_usdt=commission_amt,
+            status='credited',
+        )
+
+        # 2. Credit referrer's wallet atomically
+        type(referrer).objects.filter(pk=referrer.pk).update(
+            balance_usdt=F('balance_usdt') + commission_amt,
+            total_earned=F('total_earned') + commission_amt,
+        )
+
+        # 3. Update aggregate summary (atomic upsert)
+        AdminCommissionSummary.objects.get_or_create(admin=referrer)
+        AdminCommissionSummary.objects.filter(admin=referrer).update(
+            total_earned=F('total_earned') + commission_amt,
+            total_referrals=F('total_referrals') + 1,
+        )
+
+        # 4. Notify referrer
+        Notification.objects.create(
+            user=referrer,
+            type='referral',
+            title='💰 Commission Earned!',
+            message=f'You earned ${float(commission_amt):.2f} USDT from {user.email}\'s upgrade to Plan {deposit.tier_target}.',
+            icon='💰',
+        )
 
     def _process_deposit_rejection(self, request, deposit):
         """Helper to process a single deposit rejection"""
@@ -96,6 +157,7 @@ class DepositAdmin(admin.ModelAdmin):
             icon='❌'
         )
         return True, 'Rejected'
+
 
     def approve_deposits(self, request, queryset):
         """Approve deposits and upgrade users"""
