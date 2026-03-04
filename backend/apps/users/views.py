@@ -358,3 +358,52 @@ def agent_payment_info(request):
         'account_name': settings.account_name,
         'account_number': settings.account_number,
     })
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def apply_for_admin(request):
+    """
+    Allows an authenticated user to submit a Junior Admin application.
+    Sets admin_status to 'pending'. A Super Admin must approve before any
+    privileges are granted.
+    """
+    user = request.user
+
+    # Already an admin or superuser
+    if user.is_superuser or user.is_admin:
+        return Response(
+            {'detail': 'You already have admin access.'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # Already applied
+    if user.admin_status == 'pending':
+        return Response(
+            {'detail': 'Your admin application is already under review. Please wait for Super Admin approval.'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    if user.admin_status == 'approved':
+        return Response(
+            {'detail': 'Your application has already been approved.'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # Mark as pending
+    user.admin_status = 'pending'
+    user.save(update_fields=['admin_status'])
+
+    # Notify the user
+    Notification.objects.create(
+        user=user,
+        type='system',
+        title='📋 Admin Application Submitted',
+        message='Your Junior Admin application has been submitted. You will be notified once reviewed.',
+        icon='📋',
+    )
+
+    return Response({
+        'detail': 'Application submitted successfully. Awaiting Super Admin approval.',
+        'admin_status': 'pending',
+    }, status=status.HTTP_200_OK)

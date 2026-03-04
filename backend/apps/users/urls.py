@@ -27,4 +27,7 @@ urlpatterns = [
     
     # Agent System
     path('agent-payment-info/', views.agent_payment_info, name='agent-payment-info'),
+
+    # Junior Admin Application
+    path('apply-for-admin/', views.apply_for_admin, name='apply-for-admin'),
 ]

@@ -258,7 +258,23 @@ class WithdrawalAdmin(admin.ModelAdmin):
 class ExchangeRateAdmin(admin.ModelAdmin):
     list_display = ['usd_to_ngn', 'usd_to_ghs', 'updated_at', 'updated_by']
     readonly_fields = ['updated_at']
-    
+
+    def has_module_perms(self, request):
+        # Only Super Admins can see Exchange Rate settings
+        return request.user.is_superuser
+
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+    def has_change_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+    def has_add_permission(self, request):
+        return request.user.is_superuser
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
+
     def save_model(self, request, obj, form, change):
         obj.updated_by = request.user
         super().save_model(request, obj, form, change)
@@ -268,7 +284,7 @@ class ExchangeRateAdmin(admin.ModelAdmin):
 class PaymentSettingsAdmin(admin.ModelAdmin):
     list_display = ['bank_name', 'account_number', 'usdt_wallet', 'updated_at']
     readonly_fields = ['updated_at', 'updated_by']
-    
+
     fieldsets = (
         ('Crypto Payment', {
             'fields': ('usdt_wallet',),
@@ -284,13 +300,23 @@ class PaymentSettingsAdmin(admin.ModelAdmin):
             'fields': ('updated_at', 'updated_by'),
         }),
     )
-    
+
+    def has_module_perms(self, request):
+        # Only Super Admins can see Payment Settings
+        return request.user.is_superuser
+
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+    def has_change_permission(self, request, obj=None):
+        return request.user.is_superuser
+
     def has_add_permission(self, request):
-        return not PaymentSettings.objects.exists()
-    
+        return (not PaymentSettings.objects.exists()) and request.user.is_superuser
+
     def has_delete_permission(self, request, obj=None):
         return False
-    
+
     def save_model(self, request, obj, form, change):
         obj.updated_by = request.user
         super().save_model(request, obj, form, change)

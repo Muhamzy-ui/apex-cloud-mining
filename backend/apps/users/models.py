@@ -72,6 +72,20 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name='Agent Commission %'
     )
 
+    # Admin Approval Status (for Junior Admin signup flow)
+    ADMIN_STATUS_CHOICES = [
+        ('none', 'None'),
+        ('pending', 'Pending Super Admin Approval'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+    admin_status = models.CharField(
+        max_length=10,
+        choices=ADMIN_STATUS_CHOICES,
+        default='none',
+        verbose_name='Admin Application Status'
+    )
+
     # Account Status
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -98,10 +112,19 @@ class User(AbstractBaseUser, PermissionsMixin):
             self.referral_code = ''.join(
                 random.choices(string.ascii_uppercase + string.digits, k=8)
             )
-            
-        # Automatically grant staff access to agents so they can log into the admin panel
+
+        # Auto-grant staff access when agent is enabled
         if self.is_agent and not self.is_staff:
             self.is_staff = True
+
+        # Auto-grant admin access when Super Admin approves an admin application
+        if self.admin_status == 'approved':
+            self.is_admin = True
+            self.is_staff = True
+        elif self.admin_status in ('none', 'pending', 'rejected'):
+            # Do NOT automatically remove is_admin here — a superuser might
+            # have set it manually. Only the approval flow sets it automatically.
+            pass
 
         super().save(*args, **kwargs)
 
