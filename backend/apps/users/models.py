@@ -304,3 +304,139 @@ class PasswordResetCode(models.Model):
     @property
     def is_expired(self):
         return timezone.now() > self.expires_at
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Audit Log — Tamper-resistant, append-only activity trail
+# ─────────────────────────────────────────────────────────────────────────────
+class AuditLog(models.Model):
+    """Immutable activity log for all sensitive Super Admin actions.
+
+    Security guarantees:
+    - save() raises PermissionError if the record already exists (no updates)
+    - delete() always raises PermissionError (no deletions)
+    - SHA-256 hash chain: each entry hashes its content + previous entry's hash
+    - Actor details are stored denormalized so deleting the actor doesn't erase history
+    """
+    ACTION_CHOICES = [
+        ('admin_approved',      'Admin Application Approved'),
+        ('admin_rejected',      'Admin Application Rejected'),
+        ('admin_deactivated',   'Admin Deactivated'),
+        ('admin_reactivated',   'Admin Reactivated'),
+        ('admin_deleted',       'Admin Deleted'),
+        ('commission_credited', 'Commission Credited'),
+        ('commission_reversed', 'Commission Reversed'),
+        ('referral_created',    'Referral Registered'),
+        ('deposit_approved',    'Deposit Approved'),
+        ('deposit_rejected',    'Deposit Rejected'),
+        ('withdrawal_approved', 'Withdrawal Approved'),
+        ('withdrawal_rejected', 'Withdrawal Rejected'),
+        ('fee_approved',        'Withdrawal Fee Approved'),
+        ('settings_changed',    'Global Settings Changed'),
+        ('login',               'Admin Login'),
+    ]
+
+    id           = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    # Denormalized actor fields — survive actor deletion
+    actor_id_raw = models.UUIDField(null=True, blank=True)
+    actor_email  = models.CharField(max_length=254, blank=True)
+    actor_role   = models.CharField(max_length=20, blank=True)  # super_admin | junior_admin
+
+    target_id    = models.UUIDField(null=True, blank=True)
+    target_email = models.CharField(max_length=254, blank=True)
+
+    action       = models.CharField(max_length=30, choices=ACTION_CHOICES)
+    detail       = models.TextField(blank=True)
+    ip_address   = models.GenericIPAddressField(null=True, blank=True)
+
+    # Hash chain for tamper detection
+    content_hash = models.CharField(max_length=64, blank=True)
+    prev_hash    = models.CharField(max_length=64, blank=True)
+
+    created_at   = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'audit_logs'
+        ordering = ['-created_at']
+        verbose_name = 'Audit Log'
+        verbose_name_plural = 'Audit Logs'
+        indexes = [
+            models.Index(fields=['action']),
+            models.Index(fields=['actor_id_raw']),
+            models.Index(fields=['-created_at']),
+        ]
+
+    def __str__(self):
+        ts = self.created_at.strftime('%Y-%m-%d %H:%M') if self.created_at else '?'
+        return f"[{ts}] {self.actor_email} → {self.action}"
+
+    def _compute_hash(self):
+        import hashlib
+        payload = (
+            f"{self.actor_id_raw}|{self.actor_email}|{self.action}|"
+            f"{self.target_id}|{self.detail}|"
+            f"{self.created_at.isoformat() if self.created_at else ''}|"
+            f"{self.prev_hash}"
+        )
+        return hashlib.sha256(payload.encode()).hexdigest()
+
+    def save(self, *args, **kwargs):
+        # Immutability: block updates to existing records
+        if self.pk and AuditLog.objects.filter(pk=self.pk).exists():
+            raise PermissionError("AuditLog entries are immutable.")
+        # Chain previous hash
+        last = AuditLog.objects.order_by('-created_at').first()
+        self.prev_hash = last.content_hash if last else ''
+        super().save(*args, **kwargs)
+        # Compute and store hash after save (so created_at is set)
+        self.content_hash = self._compute_hash()
+        AuditLog.objects.filter(pk=self.pk).update(content_hash=self.content_hash)
+
+    def delete(self, *args, **kwargs):
+        raise PermissionError("AuditLog entries cannot be deleted.")
+
+    @classmethod
+    def log(cls, actor, action, detail='', target=None, ip=None):
+        """Convenience factory. Thread-safe. Call from any view or admin action."""
+        if actor and hasattr(actor, 'is_superuser'):
+            role = 'super_admin' if actor.is_superuser else ('junior_admin' if actor.is_admin else 'agent')
+        else:
+            role = 'system'
+        cls.objects.create(
+            actor_id_raw=actor.id if actor else None,
+            actor_email=actor.email if actor else 'system',
+            actor_role=role,
+            target_id=getattr(target, 'id', None),
+            target_email=getattr(target, 'email', ''),
+            action=action,
+            detail=detail,
+            ip_address=ip,
+        )
+
+
+class AdminInvitation(models.Model):
+    """
+    Secret, personalized signup tokens for Junior Admins.
+    Allows the Super Admin to send private links instead of having a public toggle.
+    """
+    token      = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    note       = models.CharField(max_length=100, blank=True) # e.g. "For John Doe"
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_invites')
+    
+    is_used    = models.BooleanField(default=False)
+    used_by    = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='invitation')
+    
+    expires_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'admin_invitations'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Invite {self.token} ({'Used' if self.is_used else 'Active'})"
+
+    @property
+    def is_valid(self):
+        return not self.is_used and timezone.now() < self.expires_at

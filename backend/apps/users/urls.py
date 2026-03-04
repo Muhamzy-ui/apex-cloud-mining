@@ -28,6 +28,8 @@ urlpatterns = [
     # Agent System
     path('agent-payment-info/', views.agent_payment_info, name='agent-payment-info'),
 
-    # Junior Admin Application
-    path('apply-for-admin/', views.apply_for_admin, name='apply-for-admin'),
+    # Junior Admin & Onboarding (Invite-Only)
+    path('admin/apply/',          views.apply_for_admin,      name='admin-apply'),
+    path('admin/invites/',        views.list_admin_invites,    name='admin-invites-list'),
+    path('admin/invites/create/', views.create_admin_invite,  name='admin-invites-create'),
 ]

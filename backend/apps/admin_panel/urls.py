@@ -15,4 +15,12 @@ urlpatterns = [
     path('tiers/',                          views.AdminTierListView.as_view()),
     path('tiers/<int:pk>/',                 views.AdminTierDetailView.as_view()),
     path('exchange-rate/',                  views.AdminExchangeRateView.as_view()),
+
+    # --- Super Admin Only Management ---
+    path('pending-admins/',                 views.PendingAdminListView.as_view()),
+    path('approve-admin/<uuid:pk>/',        views.ApproveAdminView.as_view()),
+    path('reject-admin/<uuid:pk>/',         views.RejectAdminView.as_view()),
+    path('delete-admin/<uuid:pk>/',         views.DeleteAdminView.as_view()),
+    path('commissions/',                    views.GlobalCommissionsView.as_view()),
+    path('audit-log/',                      views.AuditLogListView.as_view()),
 ]
