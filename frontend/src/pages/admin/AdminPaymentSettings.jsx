@@ -53,10 +53,16 @@ export const AdminPaymentSettings = () => {
                 <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '24px' }}>
                     {/* USDT Wallet */}
                     <div>
-                        <label className="text-muted" style={{ fontSize: '13px', display: 'block', marginBottom: '8px', fontWeight: 600 }}>
+                        <label
+                            htmlFor="agent_wallet_usdt"
+                            className="text-muted"
+                            style={{ fontSize: '13px', display: 'block', marginBottom: '8px', fontWeight: 600 }}
+                        >
                             Agent USDT Wallet (TRC20)
                         </label>
                         <input
+                            id="agent_wallet_usdt"
+                            name="agent_wallet_usdt"
                             type="text"
                             className="bg-navy rounded-xl"
                             style={{
@@ -76,10 +82,16 @@ export const AdminPaymentSettings = () => {
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                         {/* Bank Name */}
                         <div>
-                            <label className="text-muted" style={{ fontSize: '13px', display: 'block', marginBottom: '8px', fontWeight: 600 }}>
+                            <label
+                                htmlFor="agent_bank_name"
+                                className="text-muted"
+                                style={{ fontSize: '13px', display: 'block', marginBottom: '8px', fontWeight: 600 }}
+                            >
                                 Bank Name
                             </label>
                             <input
+                                id="agent_bank_name"
+                                name="agent_bank_name"
                                 type="text"
                                 className="bg-navy rounded-xl"
                                 style={{
@@ -97,10 +109,16 @@ export const AdminPaymentSettings = () => {
 
                         {/* Account Number */}
                         <div>
-                            <label className="text-muted" style={{ fontSize: '13px', display: 'block', marginBottom: '8px', fontWeight: 600 }}>
+                            <label
+                                htmlFor="agent_account_number"
+                                className="text-muted"
+                                style={{ fontSize: '13px', display: 'block', marginBottom: '8px', fontWeight: 600 }}
+                            >
                                 Account Number
                             </label>
                             <input
+                                id="agent_account_number"
+                                name="agent_account_number"
                                 type="text"
                                 className="bg-navy rounded-xl"
                                 style={{
@@ -119,10 +137,16 @@ export const AdminPaymentSettings = () => {
 
                     {/* Account Name */}
                     <div>
-                        <label className="text-muted" style={{ fontSize: '13px', display: 'block', marginBottom: '8px', fontWeight: 600 }}>
+                        <label
+                            htmlFor="agent_account_name"
+                            className="text-muted"
+                            style={{ fontSize: '13px', display: 'block', marginBottom: '8px', fontWeight: 600 }}
+                        >
                             Account Holder Name
                         </label>
                         <input
+                            id="agent_account_name"
+                            name="agent_account_name"
                             type="text"
                             className="bg-navy rounded-xl"
                             style={{

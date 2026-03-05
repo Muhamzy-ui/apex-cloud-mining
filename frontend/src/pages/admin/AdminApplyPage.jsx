@@ -51,8 +51,16 @@ export const AdminApplyPage = () => {
 
                 <form onSubmit={handleSubmit}>
                     <div style={{ marginBottom: '24px', textAlign: 'left' }}>
-                        <label className="text-muted" style={{ fontSize: '12px', display: 'block', marginBottom: '8px' }}>Secret Invite Token</label>
+                        <label
+                            htmlFor="invite_token"
+                            className="text-muted"
+                            style={{ fontSize: '12px', display: 'block', marginBottom: '8px' }}
+                        >
+                            Secret Invite Token
+                        </label>
                         <input
+                            id="invite_token"
+                            name="invite_token"
                             type="text"
                             className="bg-navy rounded-lg shadow-sm"
                             style={{

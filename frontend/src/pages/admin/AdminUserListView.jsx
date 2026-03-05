@@ -46,6 +46,8 @@ export const AdminUserListView = () => {
                 </div>
                 <div style={{ width: '300px' }}>
                     <input
+                        id="user_search"
+                        name="user_search"
                         type="text"
                         className="bg-card rounded-xl shadow-sm"
                         style={{

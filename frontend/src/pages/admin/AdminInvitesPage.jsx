@@ -59,8 +59,16 @@ export const AdminInvitesPage = () => {
                 <h2 className="font-display" style={{ fontSize: '18px', fontWeight: 600, marginBottom: '20px' }}>Generate New Invite</h2>
                 <form onSubmit={handleCreate} style={{ display: 'grid', gridTemplateColumns: '1fr 150px auto', gap: '16px', alignItems: 'end' }}>
                     <div>
-                        <label className="text-muted" style={{ display: 'block', fontSize: '12px', marginBottom: '8px' }}>Recipient Name / Note</label>
+                        <label
+                            htmlFor="invite_note"
+                            className="text-muted"
+                            style={{ display: 'block', fontSize: '12px', marginBottom: '8px' }}
+                        >
+                            Recipient Name / Note
+                        </label>
                         <input
+                            id="invite_note"
+                            name="invite_note"
                             type="text"
                             className="bg-navy rounded-lg"
                             style={{ width: '100%', padding: '12px', border: '1px solid var(--apex-border)', color: 'var(--apex-text)' }}
@@ -71,8 +79,16 @@ export const AdminInvitesPage = () => {
                         />
                     </div>
                     <div>
-                        <label className="text-muted" style={{ display: 'block', fontSize: '12px', marginBottom: '8px' }}>Valid For (Days)</label>
+                        <label
+                            htmlFor="invite_days"
+                            className="text-muted"
+                            style={{ display: 'block', fontSize: '12px', marginBottom: '8px' }}
+                        >
+                            Valid For (Days)
+                        </label>
                         <select
+                            id="invite_days"
+                            name="invite_days"
                             className="bg-navy rounded-lg"
                             style={{ width: '100%', padding: '12px', border: '1px solid var(--apex-border)', color: 'var(--apex-text)' }}
                             value={days}

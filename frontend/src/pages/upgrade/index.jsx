@@ -224,16 +224,21 @@ const PayModal = ({ plan, paymentInfo, agentName, onClose }) => {
               </span>
             </div>
 
-            <label style={{
-              display: 'block',
-              fontSize: '12px',
-              fontWeight: 600,
-              color: 'var(--apex-muted)',
-              marginBottom: '6px',
-            }}>
+            <label
+              htmlFor="tx_hash"
+              style={{
+                display: 'block',
+                fontSize: '12px',
+                fontWeight: 600,
+                color: 'var(--apex-muted)',
+                marginBottom: '6px',
+              }}
+            >
               Transaction Hash (Optional)
             </label>
             <input
+              id="tx_hash"
+              name="tx_hash"
               type="text"
               value={txHash}
               onChange={(e) => setTxHash(e.target.value)}
@@ -364,32 +369,38 @@ const PayModal = ({ plan, paymentInfo, agentName, onClose }) => {
         )}
 
         {/* Upload proof */}
-        <label style={{
-          border: `2px dashed ${proof ? 'var(--apex-green)' : 'var(--apex-border)'}`,
-          borderRadius: '14px',
-          padding: '18px',
-          display: 'block',
-          textAlign: 'center',
-          cursor: 'pointer',
-          marginBottom: '16px',
-          transition: 'border 0.2s',
-        }}>
-          <input
-            type="file"
-            accept="image/*"
-            style={{ display: 'none' }}
-            onChange={(e) => setProof(e.target.files[0])}
-          />
-          {proof ? (
-            <p style={{ color: 'var(--apex-green)', fontSize: '13px', fontWeight: 600 }}>
-              ✓ {proof.name}
-            </p>
-          ) : (
-            <p style={{ color: 'var(--apex-muted)', fontSize: '13px' }}>
-              📎 Upload payment screenshot
-            </p>
-          )}
-        </label>
+        <div style={{ marginBottom: '16px' }}>
+          <label
+            htmlFor="proof_image"
+            style={{
+              border: `2px dashed ${proof ? 'var(--apex-green)' : 'var(--apex-border)'}`,
+              borderRadius: '14px',
+              padding: '18px',
+              display: 'block',
+              textAlign: 'center',
+              cursor: 'pointer',
+              transition: 'border 0.2s',
+            }}
+          >
+            <input
+              id="proof_image"
+              name="proof_image"
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={(e) => setProof(e.target.files[0])}
+            />
+            {proof ? (
+              <p style={{ color: 'var(--apex-green)', fontSize: '13px', fontWeight: 600, margin: 0 }}>
+                ✓ {proof.name}
+              </p>
+            ) : (
+              <p style={{ color: 'var(--apex-muted)', fontSize: '13px', margin: 0 }}>
+                📎 Upload payment screenshot
+              </p>
+            )}
+          </label>
+        </div>
 
         {/* Submit button */}
         <button onClick={submit} disabled={loading} style={{

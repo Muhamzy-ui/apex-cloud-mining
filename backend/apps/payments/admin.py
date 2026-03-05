@@ -322,11 +322,10 @@ class ExchangeRateAdmin(admin.ModelAdmin):
     readonly_fields = ['updated_at']
 
     def has_module_perms(self, request):
-        # Only Super Admins can see Exchange Rate settings
-        return request.user.is_superuser
+        return request.user.is_superuser or request.user.is_admin
 
     def has_view_permission(self, request, obj=None):
-        return request.user.is_superuser
+        return request.user.is_superuser or request.user.is_admin
 
     def has_change_permission(self, request, obj=None):
         return request.user.is_superuser
@@ -364,13 +363,14 @@ class PaymentSettingsAdmin(admin.ModelAdmin):
     )
 
     def has_module_perms(self, request):
-        # Only Super Admins can see Payment Settings
-        return request.user.is_superuser
+        # Admins and Superusers can see the module
+        return request.user.is_superuser or request.user.is_admin
 
     def has_view_permission(self, request, obj=None):
-        return request.user.is_superuser
+        return request.user.is_superuser or request.user.is_admin
 
     def has_change_permission(self, request, obj=None):
+        # Only Super Admins can change global settings
         return request.user.is_superuser
 
     def has_add_permission(self, request):
