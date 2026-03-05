@@ -9,7 +9,7 @@ export const AdminApprovalPage = () => {
     const fetchPending = async () => {
         try {
             const { data } = await adminAPI.getPendingAdmins();
-            setPendingAdmins(data);
+            setPendingAdmins(Array.isArray(data) ? data : data.results || []);
         } catch (err) {
             toast.error('Failed to load pending applications');
         } finally {

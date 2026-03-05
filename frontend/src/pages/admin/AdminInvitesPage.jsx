@@ -12,7 +12,7 @@ export const AdminInvitesPage = () => {
     const fetchInvites = async () => {
         try {
             const { data } = await adminAPI.getInvites();
-            setInvites(data);
+            setInvites(Array.isArray(data) ? data : data.results || []);
         } catch (err) {
             toast.error('Failed to load invites');
         } finally {

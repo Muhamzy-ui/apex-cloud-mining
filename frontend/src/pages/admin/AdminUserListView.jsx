@@ -11,7 +11,8 @@ export const AdminUserListView = () => {
         setIsLoading(true);
         try {
             const { data } = await adminAPI.getUsers({ search });
-            setUsers(data);
+            // Handle both paginated (results) and non-paginated responses
+            setUsers(Array.isArray(data) ? data : data.results || []);
         } catch (err) {
             toast.error('Failed to load users');
         } finally {
