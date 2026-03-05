@@ -25,6 +25,7 @@ import { AdminApplyPage } from './pages/admin/AdminApplyPage';
 import { AdminApprovalPage } from './pages/admin/AdminApprovalPage';
 import { AdminUserListView } from './pages/admin/AdminUserListView';
 import { AdminDashboardOverview } from './pages/admin/AdminDashboardOverview';
+import { AdminPaymentSettings } from './pages/admin/AdminPaymentSettings';
 import { AdminLayout } from './components/layout/AdminLayout';
 
 // Components
@@ -208,6 +209,7 @@ export default function App() {
           <Route path="approvals" element={<AdminApprovalPage />} />
           <Route path="audit" element={<div>Audit Log (Coming Soon)</div>} />
           <Route path="users" element={<AdminUserListView />} />
+          <Route path="settings" element={<AdminPaymentSettings />} />
         </Route>
 
         {/* Junior Admin Dashboard */}
@@ -216,6 +218,7 @@ export default function App() {
           <Route path="users" element={<AdminUserListView />} />
           <Route path="deposits" element={<div>Deposits (Coming Soon)</div>} />
           <Route path="withdrawals" element={<div>Withdrawals (Coming Soon)</div>} />
+          <Route path="settings" element={<AdminPaymentSettings />} />
         </Route>
 
 

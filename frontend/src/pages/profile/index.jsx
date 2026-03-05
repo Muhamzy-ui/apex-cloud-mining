@@ -698,7 +698,7 @@ export const ProfilePage = () => {
           }}>
             <input
               type="text"
-              value={`https://apexmining.com/ref/${user.referral_code}`}
+              value={`https://apex-mining.com/ref/${user.referral_code}`}
               readOnly
               style={{
                 flex: 1,
@@ -712,7 +712,7 @@ export const ProfilePage = () => {
             />
             <button
               onClick={() => {
-                navigator.clipboard.writeText(`https://apexmining.com/ref/${user.referral_code}`);
+                navigator.clipboard.writeText(`https://apex-mining.com/ref/${user.referral_code}`);
                 toast.success('Link copied!');
               }}
               style={{

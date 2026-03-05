@@ -17,9 +17,11 @@ export const AdminLayout = ({ role }) => {
         { label: 'Admin Approval', icon: '✅', path: '/admin/approvals' },
         { label: 'Audit Log', icon: '📋', path: '/admin/audit' },
         { label: 'User List', icon: '👥', path: '/admin/users' },
+        { label: 'Payment Settings', icon: '⚙️', path: '/admin/settings' },
     ] : [
         { label: 'Overview', icon: '📊', path: '/admin/junior' },
         { label: 'My Referrals', icon: '👥', path: '/admin/users' },
+        { label: 'Payment Settings', icon: '⚙️', path: '/admin/settings' },
         { label: 'Deposits', icon: '💳', path: '/admin/deposits' },
         { label: 'Withdrawals', icon: '💸', path: '/admin/withdrawals' },
     ];

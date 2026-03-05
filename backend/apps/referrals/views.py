@@ -51,7 +51,7 @@ class ReferralDashboardView(APIView):
 
         return Response({
             'referral_code':    user.referral_code,
-            'referral_link':    f"https://apexcloudmining.com/ref/{user.referral_code}",
+            'referral_link':    f"https://apex-mining.com/ref/{user.referral_code}",
             'total_referrals':  referred_users.count(),
             'total_commission': total_commission,
             'commission_pct':   float(user.agent_commission_percent),
