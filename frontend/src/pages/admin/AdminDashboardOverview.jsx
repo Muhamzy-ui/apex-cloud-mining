@@ -32,13 +32,43 @@ export const AdminDashboardOverview = () => {
 
     return (
         <div className="admin-overview" style={{ maxWidth: '1200px', margin: '0 auto' }}>
-            <header style={{ marginBottom: '40px' }}>
-                <h1 className="font-display" style={{ fontSize: '32px', fontWeight: 700, marginBottom: '8px' }}>
-                    {role === 'super' ? 'Global Overview' : 'Operational Overview'}
-                </h1>
-                <p className="text-muted">
-                    {role === 'super' ? 'Real-time performance metrics across the entire platform.' : 'Monitor your referred network and financial activity.'}
-                </p>
+            <header style={{ marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                <div>
+                    <h1 className="font-display" style={{ fontSize: '32px', fontWeight: 700, marginBottom: '8px' }}>
+                        {role === 'super' ? 'Global Overview' : 'Operational Overview'}
+                    </h1>
+                    <p className="text-muted">
+                        {role === 'super' ? 'Real-time performance metrics across the entire platform.' : 'Monitor your referred network and financial activity.'}
+                    </p>
+                </div>
+
+                {/* Referral Link Card */}
+                <div className="bg-navy rounded-2xl" style={{ padding: '16px 24px', border: '1px solid var(--apex-border)', display: 'flex', alignItems: 'center', gap: '20px' }}>
+                    <div>
+                        <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--apex-blue)', textTransform: 'uppercase', marginBottom: '4px' }}>Your Referral Link</div>
+                        <div style={{ fontSize: '14px', fontWeight: 600, fontFamily: 'monospace' }}>
+                            apex-mining.com/register?ref={user?.referral_code}
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => {
+                            navigator.clipboard.writeText(`https://apex-mining.com/register?ref=${user?.referral_code}`);
+                            toast.success('Referral link copied!');
+                        }}
+                        className="rounded-lg"
+                        style={{
+                            padding: '8px 16px',
+                            background: 'var(--grad-blue)',
+                            color: 'white',
+                            border: 'none',
+                            fontSize: '13px',
+                            fontWeight: 700,
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Copy Link
+                    </button>
+                </div>
             </header>
 
             {/* Stat Grid */}
