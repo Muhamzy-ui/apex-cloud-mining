@@ -2,7 +2,7 @@
  * APEX MINING - APP ROUTER (PRODUCTION READY)
  */
 import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 
 import useAuthStore from './context/authStore';
@@ -57,6 +57,12 @@ const Guest = ({ children }) => {
   }
 
   return children;
+};
+
+// Referral Redirect Component
+const ReferralRedirect = () => {
+  const { code } = useParams();
+  return <Navigate to={`/register?ref=${code}`} replace />;
 };
 
 export default function App() {
@@ -216,7 +222,7 @@ export default function App() {
 
 
         {/* Referral signup */}
-        <Route path="/ref/:code" element={<Navigate to="/register" replace />} />
+        <Route path="/ref/:code" element={<ReferralRedirect />} />
 
         {/* Default routes */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />

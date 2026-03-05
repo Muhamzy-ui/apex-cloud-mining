@@ -1,8 +1,8 @@
 /**
  * APEX MINING - AUTH PAGES (WITH EMAIL VERIFICATION & PASSWORD RESET)
  */
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { AuthLayout, ApexLogo } from '../../components/layout';
 import { Button, Select } from '../../components/ui';
 import useAuthStore from '../../context/authStore';
@@ -398,6 +398,9 @@ export const LoginPage = () => {
    REGISTER PAGE
    ============================================================ */
 export const RegisterPage = () => {
+  const [searchParams] = useSearchParams();
+  const refCode = searchParams.get('ref');
+
   const [form, setForm] = useState({
     full_name: '',
     email: '',
@@ -405,11 +408,19 @@ export const RegisterPage = () => {
     country: 'NG',
     password: '',
     confirm_password: '',
-    referral_code: '',
+    referral_code: refCode || '',
   });
+
   const [verifyEmail, setVerifyEmail] = useState(null);
   const { isLoading, setLoading } = useAuthStore();
   const navigate = useNavigate();
+
+  // Pre-fill referral code if found in search params
+  useEffect(() => {
+    if (refCode) {
+      setForm(prev => ({ ...prev, referral_code: refCode }));
+    }
+  }, [refCode]);
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
