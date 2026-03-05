@@ -99,14 +99,19 @@ class AdminStatsView(APIView):
             deposits_qs   = Deposit.objects.filter(user__referred_by=user)
             withdraw_qs   = Withdrawal.objects.filter(user__referred_by=user)
 
+        total_deposits    = float(deposits_qs.filter(status='approved').aggregate(t=Sum('amount_usd'))['t'] or 0)
+        total_withdrawals = float(withdraw_qs.filter(status='approved').aggregate(t=Sum('amount_usdt'))['t'] or 0)
+
         return Response({
-            'total_users':         users_qs.count(),
-            'new_today':           users_qs.filter(date_joined__date=today).count(),
-            'pending_deposits':    deposits_qs.filter(status='pending').count(),
-            'pending_withdrawals': withdraw_qs.filter(status='pending').count(),
-            'total_deposits':      float(deposits_qs.filter(status='approved').aggregate(t=Sum('amount_usd'))['t'] or 0),
-            'total_withdrawals':   float(withdraw_qs.filter(status='approved').aggregate(t=Sum('amount_usdt'))['t'] or 0),
-            'users_by_tier': list(users_qs.values('tier').annotate(count=Count('id')).order_by('tier')),
+            'total_users':          users_qs.count(),
+            'new_today':            users_qs.filter(date_joined__date=today).count(),
+            'pending_deposits':     deposits_qs.filter(status='pending').count(),
+            'pending_withdrawals':  withdraw_qs.filter(status='pending').count(),
+            'approved_withdrawals': withdraw_qs.filter(status='approved').count(),
+            'total_deposits':       total_deposits,
+            'total_withdrawals':    total_withdrawals,
+            'total_volume':         total_deposits + total_withdrawals,
+            'users_by_tier':        list(users_qs.values('tier').annotate(count=Count('id')).order_by('tier')),
         })
 
 

@@ -19,8 +19,19 @@ import { ProfilePage, EditProfilePage, ChangePasswordPage } from './pages/profil
 import { HistoryPage, ReferralPage } from './pages/history';
 import { WithdrawFeePage } from './pages/withdraw-fee';
 
+// Admin Pages
+import { AdminInvitesPage } from './pages/admin/AdminInvitesPage';
+import { AdminApplyPage } from './pages/admin/AdminApplyPage';
+import { AdminApprovalPage } from './pages/admin/AdminApprovalPage';
+import { AdminUserListView } from './pages/admin/AdminUserListView';
+import { AdminDashboardOverview } from './pages/admin/AdminDashboardOverview';
+import { AdminLayout } from './components/layout/AdminLayout';
+
 // Components
 import { SupportWidget } from './components/SupportWidget';
+
+// Guards
+import { SuperAdminGuard, JuniorAdminGuard, AdminRedirect } from './components/guards/AdminGuards';
 
 import './styles/global.css';
 
@@ -33,7 +44,7 @@ const Protected = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
 
-  return children;
+  return <AdminRedirect>{children}</AdminRedirect>;
 };
 
 // Guest Route (redirect if logged in)
@@ -186,6 +197,26 @@ export default function App() {
             </Protected>
           }
         />
+
+        {/* Admin Routes */}
+        <Route path="/admin/apply" element={<AdminApplyPage />} />
+
+        {/* Super Admin Dashboard */}
+        <Route path="/admin" element={<SuperAdminGuard><AdminLayout role="super" /></SuperAdminGuard>}>
+          <Route path="super" element={<AdminDashboardOverview role="super" />} />
+          <Route path="invites" element={<AdminInvitesPage />} />
+          <Route path="approvals" element={<AdminApprovalPage />} />
+          <Route path="audit" element={<div>Audit Log (Coming Soon)</div>} />
+          <Route path="users" element={<AdminUserListView />} />
+        </Route>
+
+        {/* Junior Admin Dashboard */}
+        <Route path="/admin" element={<JuniorAdminGuard><AdminLayout role="junior" /></JuniorAdminGuard>}>
+          <Route path="junior" element={<AdminDashboardOverview role="junior" />} />
+          <Route path="users" element={<AdminUserListView />} />
+          <Route path="deposits" element={<div>Deposits (Coming Soon)</div>} />
+          <Route path="withdrawals" element={<div>Withdrawals (Coming Soon)</div>} />
+        </Route>
 
 
         {/* Referral signup */}

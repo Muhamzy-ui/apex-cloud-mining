@@ -204,4 +204,49 @@ export const referralsAPI = {
   dashboard: () => apiClient.get('/referrals/'),
 };
 
+// ==========================
+// ADMIN API (Super & Junior)
+// ==========================
+export const adminAPI = {
+  // Global stats (Super sees all, Junior sees downline)
+  getStats: () => apiClient.get('/admin/stats/'),
+
+  // User management
+  getUsers: (params) => apiClient.get('/admin/users/', { params }),
+  getUser: (id) => apiClient.get(`/admin/users/${id}/`),
+  toggleUser: (id) => apiClient.post(`/admin/users/${id}/toggle/`),
+
+  // Deposit/Withdrawal management
+  getDeposits: () => apiClient.get('/admin/deposits/'),
+  approveDeposit: (id) => apiClient.post(`/admin/deposits/${id}/approve/`),
+  rejectDeposit: (id, reason) => apiClient.post(`/admin/deposits/${id}/reject/`, { reason }),
+
+  getWithdrawals: () => apiClient.get('/admin/withdrawals/'),
+  approveWithdrawal: (id, txHash) => apiClient.post(`/admin/withdrawals/${id}/approve/`, { tx_hash: txHash }),
+  rejectWithdrawal: (id, reason) => apiClient.post(`/admin/withdrawals/${id}/reject/`, { reason }),
+
+  // Super Admin only: Admin Approval
+  getPendingAdmins: () => apiClient.get('/admin/pending-admins/'),
+  approveAdmin: (id) => apiClient.post(`/admin/approve-admin/${id}/`),
+  rejectAdmin: (id) => apiClient.post(`/admin/reject-admin/${id}/`),
+  deleteAdmin: (id) => apiClient.delete(`/admin/delete-admin/${id}/`),
+
+  // Super Admin only: Invitations
+  createInvite: (data) => apiClient.post('/users/admin/invites/create/', data),
+  getInvites: () => apiClient.get('/users/admin/invites/'),
+
+  // Super Admin only: Global Commissions & Audit
+  getGlobalCommissions: () => apiClient.get('/admin/commissions/'),
+  getAuditLogs: (params) => apiClient.get('/admin/audit-log/', { params }),
+
+  // Misc
+  getTiers: () => apiClient.get('/admin/tiers/'),
+  updateTier: (id, data) => apiClient.put(`/admin/tiers/${id}/`, data),
+  getExchangeRate: () => apiClient.get('/admin/exchange-rate/'),
+  updateExchangeRate: (data) => apiClient.put('/admin/exchange-rate/', data),
+
+  // Application (Uses token)
+  applyForAdmin: (token) => apiClient.post('/users/admin/apply/', { invite_token: token }),
+};
+
 export default apiClient;
