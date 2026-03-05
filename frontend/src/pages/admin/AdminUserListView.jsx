@@ -37,14 +37,21 @@ export const AdminUserListView = () => {
 
     return (
         <div className="page-content" style={{ maxWidth: '1200px', margin: '0 auto' }}>
-            <header style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+            <header style={{
+                marginBottom: '32px',
+                display: 'flex',
+                flexDirection: window.innerWidth < 768 ? 'column' : 'row',
+                justifyContent: 'space-between',
+                alignItems: window.innerWidth < 768 ? 'flex-start' : 'flex-end',
+                gap: '20px'
+            }}>
                 <div>
                     <h1 className="font-display" style={{ fontSize: '32px', fontWeight: 700, marginBottom: '8px' }}>
                         User Management
                     </h1>
                     <p className="text-muted">View and manage accounts in your network.</p>
                 </div>
-                <div style={{ width: '300px' }}>
+                <div style={{ width: window.innerWidth < 768 ? '100%' : '300px' }}>
                     <input
                         id="user_search"
                         name="user_search"

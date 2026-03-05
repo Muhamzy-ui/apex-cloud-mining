@@ -46,9 +46,9 @@ export const AdminInvitesPage = () => {
     };
 
     return (
-        <div className="page-content" style={{ maxWidth: '1000px', margin: '0 auto', paddingTop: '40px' }}>
+        <div className="page-content" style={{ maxWidth: '1000px', margin: '0 auto', paddingTop: window.innerWidth < 768 ? '0px' : '40px' }}>
             <header style={{ marginBottom: '32px' }}>
-                <h1 className="font-display" style={{ fontSize: '32px', fontWeight: 700, marginBottom: '8px' }}>
+                <h1 className="font-display" style={{ fontSize: window.innerWidth < 768 ? '24px' : '32px', fontWeight: 700, marginBottom: '8px' }}>
                     Admin Invitations
                 </h1>
                 <p className="text-muted">Generate secret links to onboard new Junior Admins.</p>
@@ -57,7 +57,12 @@ export const AdminInvitesPage = () => {
             {/* Generator Card */}
             <div className="bg-card rounded-2xl shadow-md" style={{ padding: '24px', marginBottom: '32px', border: '1px solid var(--apex-border)' }}>
                 <h2 className="font-display" style={{ fontSize: '18px', fontWeight: 600, marginBottom: '20px' }}>Generate New Invite</h2>
-                <form onSubmit={handleCreate} style={{ display: 'grid', gridTemplateColumns: '1fr 150px auto', gap: '16px', alignItems: 'end' }}>
+                <form onSubmit={handleCreate} style={{
+                    display: 'grid',
+                    gridTemplateColumns: window.innerWidth < 768 ? '1fr' : '1fr 150px auto',
+                    gap: '16px',
+                    alignItems: 'end'
+                }}>
                     <div>
                         <label
                             htmlFor="invite_note"

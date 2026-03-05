@@ -40,8 +40,11 @@ export const AdminPaymentSettings = () => {
 
     return (
         <div className="page-content" style={{ maxWidth: '800px', margin: '0 auto' }}>
-            <header style={{ marginBottom: '32px' }}>
-                <h1 className="font-display" style={{ fontSize: '32px', fontWeight: 700, marginBottom: '8px' }}>
+            <header style={{
+                marginBottom: '32px',
+                paddingTop: window.innerWidth < 768 ? '0px' : '40px'
+            }}>
+                <h1 className="font-display" style={{ fontSize: window.innerWidth < 768 ? '24px' : '32px', fontWeight: 700, marginBottom: '8px' }}>
                     Payment Settings
                 </h1>
                 <p className="text-muted">
@@ -49,7 +52,7 @@ export const AdminPaymentSettings = () => {
                 </p>
             </header>
 
-            <div className="bg-card rounded-2xl shadow-md" style={{ padding: '32px', border: '1px solid var(--apex-border)' }}>
+            <div className="bg-card rounded-2xl shadow-md" style={{ padding: window.innerWidth < 768 ? '24px' : '32px', border: '1px solid var(--apex-border)' }}>
                 <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '24px' }}>
                     {/* USDT Wallet */}
                     <div>
@@ -79,7 +82,11 @@ export const AdminPaymentSettings = () => {
                         />
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: window.innerWidth < 640 ? '1fr' : '1fr 1fr',
+                        gap: '20px'
+                    }}>
                         {/* Bank Name */}
                         <div>
                             <label
@@ -168,6 +175,7 @@ export const AdminPaymentSettings = () => {
                             disabled={loading}
                             className="rounded-xl shadow-md hover-up"
                             style={{
+                                width: window.innerWidth < 640 ? '100%' : 'auto',
                                 padding: '16px 40px',
                                 background: 'var(--grad-blue)',
                                 color: 'white',

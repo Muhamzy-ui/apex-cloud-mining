@@ -39,10 +39,15 @@ export const AdminApplyPage = () => {
     };
 
     return (
-        <div className="page-content" style={{ maxWidth: '500px', margin: '0 auto', paddingTop: '80px', textAlign: 'center' }}>
-            <div className="bg-card rounded-2xl shadow-lg" style={{ padding: '40px', border: '1px solid var(--apex-border)' }}>
+        <div className="page-content" style={{
+            maxWidth: '500px',
+            margin: '0 auto',
+            padding: window.innerWidth < 768 ? '24px' : '80px 24px',
+            textAlign: 'center'
+        }}>
+            <div className="bg-card rounded-2xl shadow-lg" style={{ padding: window.innerWidth < 768 ? '32px' : '40px', border: '1px solid var(--apex-border)' }}>
                 <div style={{ fontSize: '48px', marginBottom: '24px' }}>📩</div>
-                <h1 className="font-display" style={{ fontSize: '28px', fontWeight: 700, marginBottom: '16px' }}>
+                <h1 className="font-display" style={{ fontSize: window.innerWidth < 768 ? '24px' : '28px', fontWeight: 700, marginBottom: '16px' }}>
                     Admin Application
                 </h1>
                 <p className="text-muted" style={{ marginBottom: '32px' }}>

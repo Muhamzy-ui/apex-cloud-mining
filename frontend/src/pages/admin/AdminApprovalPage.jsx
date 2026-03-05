@@ -38,8 +38,11 @@ export const AdminApprovalPage = () => {
 
     return (
         <div className="page-content" style={{ maxWidth: '1000px', margin: '0 auto' }}>
-            <header style={{ marginBottom: '32px' }}>
-                <h1 className="font-display" style={{ fontSize: '32px', fontWeight: 700, marginBottom: '8px' }}>
+            <header style={{
+                marginBottom: '32px',
+                paddingTop: window.innerWidth < 768 ? '0px' : '40px'
+            }}>
+                <h1 className="font-display" style={{ fontSize: window.innerWidth < 768 ? '24px' : '32px', fontWeight: 700, marginBottom: '8px' }}>
                     Admin Approvals
                 </h1>
                 <p className="text-muted">Review and manage pending applications for Junior Admin roles.</p>

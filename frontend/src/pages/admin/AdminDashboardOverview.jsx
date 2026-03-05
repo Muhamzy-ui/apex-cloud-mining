@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { adminAPI } from '../../services/api';
 import toast from 'react-hot-toast';
 import useAuthStore from '../../context/authStore';
 
 export const AdminDashboardOverview = () => {
     const { user } = useAuthStore();
+    const navigate = useNavigate();
     const role = user?.is_superuser ? 'super' : 'junior';
     const [stats, setStats] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -32,7 +34,14 @@ export const AdminDashboardOverview = () => {
 
     return (
         <div className="admin-overview" style={{ maxWidth: '1200px', margin: '0 auto' }}>
-            <header style={{ marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+            <header style={{
+                marginBottom: '40px',
+                display: 'flex',
+                flexDirection: window.innerWidth < 768 ? 'column' : 'row',
+                justifyContent: 'space-between',
+                alignItems: window.innerWidth < 768 ? 'flex-start' : 'flex-end',
+                gap: '24px'
+            }}>
                 <div>
                     <h1 className="font-display" style={{ fontSize: '32px', fontWeight: 700, marginBottom: '8px' }}>
                         {role === 'super' ? 'Global Overview' : 'Operational Overview'}
@@ -43,10 +52,18 @@ export const AdminDashboardOverview = () => {
                 </div>
 
                 {/* Referral Link Card */}
-                <div className="bg-navy rounded-2xl" style={{ padding: '16px 24px', border: '1px solid var(--apex-border)', display: 'flex', alignItems: 'center', gap: '20px' }}>
-                    <div>
+                <div className="bg-navy rounded-2xl" style={{
+                    padding: '16px 24px',
+                    border: '1px solid var(--apex-border)',
+                    display: 'flex',
+                    flexDirection: window.innerWidth < 480 ? 'column' : 'row',
+                    alignItems: window.innerWidth < 480 ? 'flex-start' : 'center',
+                    gap: '20px',
+                    width: window.innerWidth < 768 ? '100%' : 'auto'
+                }}>
+                    <div style={{ flex: 1 }}>
                         <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--apex-blue)', textTransform: 'uppercase', marginBottom: '4px' }}>Your Referral Link</div>
-                        <div style={{ fontSize: '14px', fontWeight: 600, fontFamily: 'monospace' }}>
+                        <div style={{ fontSize: '14px', fontWeight: 600, fontFamily: 'monospace', wordBreak: 'break-all' }}>
                             apex-mining.com/register?ref={user?.referral_code}
                         </div>
                     </div>
@@ -63,7 +80,8 @@ export const AdminDashboardOverview = () => {
                             border: 'none',
                             fontSize: '13px',
                             fontWeight: 700,
-                            cursor: 'pointer'
+                            cursor: 'pointer',
+                            width: window.innerWidth < 480 ? '100%' : 'auto'
                         }}
                     >
                         Copy Link
@@ -72,7 +90,12 @@ export const AdminDashboardOverview = () => {
             </header>
 
             {/* Stat Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '24px', marginBottom: '48px' }}>
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                gap: '24px',
+                marginBottom: '48px'
+            }}>
                 {cards.map((card, i) => (
                     <div key={i} className="bg-card rounded-2xl shadow-sm hover-up" style={{ padding: '24px', border: '1px solid var(--apex-border)', transition: '0.3s' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
@@ -86,23 +109,43 @@ export const AdminDashboardOverview = () => {
                 ))}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '32px' }}>
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 400px), 1fr))',
+                gap: '32px'
+            }}>
                 {/* Quick Actions */}
                 <div className="bg-card rounded-2xl" style={{ padding: '32px', border: '1px solid var(--apex-border)' }}>
                     <h3 className="font-display" style={{ fontSize: '18px', fontWeight: 700, marginBottom: '24px' }}>Quick Actions</h3>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 480 ? '1fr' : '1fr 1fr', gap: '16px' }}>
                         {role === 'super' && (
-                            <button className="bg-navy rounded-xl" style={{ padding: '16px', border: '1px solid var(--apex-border)', color: 'white', fontWeight: 600, cursor: 'pointer', textAlign: 'left' }}>
+                            <button
+                                onClick={() => navigate('/admin/invites')}
+                                className="bg-navy rounded-xl hover-up"
+                                style={{ padding: '16px', border: '1px solid var(--apex-border)', color: 'white', fontWeight: 600, cursor: 'pointer', textAlign: 'left', transition: '0.2s' }}
+                            >
                                 Generate Invite Link
                             </button>
                         )}
-                        <button className="bg-navy rounded-xl" style={{ padding: '16px', border: '1px solid var(--apex-border)', color: 'white', fontWeight: 600, cursor: 'pointer', textAlign: 'left' }}>
+                        <button
+                            onClick={() => navigate('/admin/deposits')}
+                            className="bg-navy rounded-xl hover-up"
+                            style={{ padding: '16px', border: '1px solid var(--apex-border)', color: 'white', fontWeight: 600, cursor: 'pointer', textAlign: 'left', transition: '0.2s' }}
+                        >
                             Review Deposits
                         </button>
-                        <button className="bg-navy rounded-xl" style={{ padding: '16px', border: '1px solid var(--apex-border)', color: 'white', fontWeight: 600, cursor: 'pointer', textAlign: 'left' }}>
+                        <button
+                            onClick={() => navigate('/admin/users')}
+                            className="bg-navy rounded-xl hover-up"
+                            style={{ padding: '16px', border: '1px solid var(--apex-border)', color: 'white', fontWeight: 600, cursor: 'pointer', textAlign: 'left', transition: '0.2s' }}
+                        >
                             Manage Users
                         </button>
-                        <button className="bg-navy rounded-xl" style={{ padding: '16px', border: '1px solid var(--apex-border)', color: 'white', fontWeight: 600, cursor: 'pointer', textAlign: 'left' }}>
+                        <button
+                            onClick={() => navigate('/admin/settings')}
+                            className="bg-navy rounded-xl hover-up"
+                            style={{ padding: '16px', border: '1px solid var(--apex-border)', color: 'white', fontWeight: 600, cursor: 'pointer', textAlign: 'left', transition: '0.2s' }}
+                        >
                             Update Settings
                         </button>
                     </div>
@@ -127,6 +170,14 @@ export const AdminDashboardOverview = () => {
                     </div>
                 </div>
             </div>
+
+            <style dangerouslySetInnerHTML={{
+                __html: `
+                .hover-up:hover {
+                    transform: translateY(-4px);
+                    border-color: var(--apex-blue) !important;
+                }
+            ` }} />
         </div>
     );
 };
