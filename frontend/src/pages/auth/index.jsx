@@ -122,13 +122,13 @@ const InputWithToggle = ({ label, type, placeholder, value, onChange, required }
 };
 
 // Regular Input
-const Input = ({ label, type = 'text', placeholder, value, onChange, required }) => {
+const Input = ({ label, type = 'text', placeholder, value, onChange, required, readOnly }) => {
   if (type === 'password') {
     return <InputWithToggle label={label} type={type} placeholder={placeholder} value={value} onChange={onChange} required={required} />;
   }
 
   return (
-    <div style={{ marginBottom: '16px' }}>
+    <div style={{ marginBottom: '16px', opacity: readOnly ? 0.7 : 1 }}>
       <label style={{
         display: 'block',
         fontSize: '13px',
@@ -137,6 +137,7 @@ const Input = ({ label, type = 'text', placeholder, value, onChange, required })
         marginBottom: '8px',
       }}>
         {label}
+        {readOnly && <span style={{ fontSize: '10px', color: 'var(--apex-blue)', marginLeft: '8px' }}>(Locked)</span>}
       </label>
       <input
         type={type}
@@ -144,6 +145,7 @@ const Input = ({ label, type = 'text', placeholder, value, onChange, required })
         value={value}
         onChange={onChange}
         required={required}
+        readOnly={readOnly}
         style={{
           width: '100%',
           padding: '14px 16px',
@@ -153,9 +155,10 @@ const Input = ({ label, type = 'text', placeholder, value, onChange, required })
           color: 'var(--apex-text)',
           fontSize: '14px',
           outline: 'none',
+          cursor: readOnly ? 'not-allowed' : 'text'
         }}
-        onFocus={(e) => e.target.style.borderColor = 'var(--apex-blue)'}
-        onBlur={(e) => e.target.style.borderColor = 'var(--apex-border)'}
+        onFocus={(e) => !readOnly && (e.target.style.borderColor = 'var(--apex-blue)')}
+        onBlur={(e) => !readOnly && (e.target.style.borderColor = 'var(--apex-border)')}
       />
     </div>
   );
@@ -562,6 +565,7 @@ export const RegisterPage = () => {
             placeholder="e.g. APEX7X3K"
             value={form.referral_code}
             onChange={set('referral_code')}
+            readOnly={!!refCode}
           />
 
           <Button type="submit" fullWidth loading={isLoading}>
