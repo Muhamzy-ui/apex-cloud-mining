@@ -331,33 +331,40 @@ def mark_notification_read(request, notification_id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def agent_payment_info(request):
-    """Get payment info for user's referrer (agent)"""
+    """Get payment info for user's referrer (agent or junior admin)"""
     user = request.user
     
-    # Check if user was referred by an agent
-    if user.referred_by and user.referred_by.is_agent:
-        agent = user.referred_by
-        return Response({
-            'has_agent': True,
-            'agent_name': agent.full_name or agent.email.split('@')[0],
-            'usdt_wallet': agent.agent_wallet_usdt or '',
-            'bank_name': agent.agent_bank_name or '',
-            'account_name': agent.agent_account_name or '',
-            'account_number': agent.agent_account_number or '',
-        })
-    
-    # No agent, use default payment settings
     from apps.payments.models import PaymentSettings
     settings = PaymentSettings.get_settings()
     
-    return Response({
+    # Default values from system settings
+    info = {
         'has_agent': False,
         'agent_name': None,
         'usdt_wallet': settings.usdt_wallet,
         'bank_name': settings.bank_name,
         'account_name': settings.account_name,
         'account_number': settings.account_number,
-    })
+    }
+
+    # Override with referrer details if they are an agent or admin
+    if user.referred_by:
+        referrer = user.referred_by
+        if referrer.is_agent or referrer.is_admin:
+            info['has_agent'] = True
+            info['agent_name'] = referrer.full_name or referrer.email.split('@')[0]
+            
+            # Individual field fallbacks — if admin didn't set it, use system default
+            if referrer.agent_wallet_usdt:
+                info['usdt_wallet'] = referrer.agent_wallet_usdt
+            if referrer.agent_bank_name:
+                info['bank_name'] = referrer.agent_bank_name
+            if referrer.agent_account_name:
+                info['account_name'] = referrer.agent_account_name
+            if referrer.agent_account_number:
+                info['account_number'] = referrer.agent_account_number
+
+    return Response(info)
 
 
 from apps.users.permissions import IsSuperAdmin
