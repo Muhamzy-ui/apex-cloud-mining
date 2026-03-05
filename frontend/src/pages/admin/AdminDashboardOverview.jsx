@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { adminAPI } from '../../services/api';
 import toast from 'react-hot-toast';
+import useAuthStore from '../../context/authStore';
 
-export const AdminDashboardOverview = ({ role }) => {
+export const AdminDashboardOverview = () => {
+    const { user } = useAuthStore();
+    const role = user?.is_superuser ? 'super' : 'junior';
     const [stats, setStats] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 

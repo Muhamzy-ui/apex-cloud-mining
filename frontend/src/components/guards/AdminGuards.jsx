@@ -47,8 +47,9 @@ export const AdminRedirect = ({ children }) => {
     const { user, isAuthenticated } = useAuthStore();
 
     if (isAuthenticated) {
-        if (user?.is_superuser) return <Navigate to="/admin/super" replace />;
-        if (user?.is_admin) return <Navigate to="/admin/junior" replace />;
+        if (user?.is_superuser || user?.is_admin) {
+            return <Navigate to="/admin/overview" replace />;
+        }
     }
 
     return children;

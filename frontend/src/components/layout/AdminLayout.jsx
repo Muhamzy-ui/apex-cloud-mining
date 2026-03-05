@@ -2,9 +2,10 @@ import React from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import useAuthStore from '../../context/authStore';
 
-export const AdminLayout = ({ role }) => {
+export const AdminLayout = () => {
     const { logout, user } = useAuthStore();
     const navigate = useNavigate();
+    const role = user?.is_superuser ? 'super' : 'junior';
 
     const handleLogout = () => {
         logout();
@@ -12,14 +13,14 @@ export const AdminLayout = ({ role }) => {
     };
 
     const navItems = role === 'super' ? [
-        { label: 'Overview', icon: '📊', path: '/admin/super' },
+        { label: 'Overview', icon: '📊', path: '/admin/overview' },
         { label: 'Invitations', icon: '📩', path: '/admin/invites' },
         { label: 'Admin Approval', icon: '✅', path: '/admin/approvals' },
         { label: 'Audit Log', icon: '📋', path: '/admin/audit' },
         { label: 'User List', icon: '👥', path: '/admin/users' },
         { label: 'Payment Settings', icon: '⚙️', path: '/admin/settings' },
     ] : [
-        { label: 'Overview', icon: '📊', path: '/admin/junior' },
+        { label: 'Overview', icon: '📊', path: '/admin/overview' },
         { label: 'My Referrals', icon: '👥', path: '/admin/users' },
         { label: 'Payment Settings', icon: '⚙️', path: '/admin/settings' },
         { label: 'Deposits', icon: '💳', path: '/admin/deposits' },

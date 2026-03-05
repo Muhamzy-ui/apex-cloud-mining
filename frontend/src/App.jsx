@@ -199,26 +199,19 @@ export default function App() {
           }
         />
 
-        {/* Admin Routes */}
+        {/* Admin Routes (Unified) */}
         <Route path="/admin/apply" element={<AdminApplyPage />} />
 
-        {/* Super Admin Dashboard */}
-        <Route path="/admin" element={<SuperAdminGuard><AdminLayout role="super" /></SuperAdminGuard>}>
-          <Route path="super" element={<AdminDashboardOverview role="super" />} />
-          <Route path="invites" element={<AdminInvitesPage />} />
-          <Route path="approvals" element={<AdminApprovalPage />} />
-          <Route path="audit" element={<div>Audit Log (Coming Soon)</div>} />
+        <Route path="/admin" element={<JuniorAdminGuard><AdminLayout /></JuniorAdminGuard>}>
+          <Route index element={<Navigate to="overview" replace />} />
+          <Route path="overview" element={<AdminDashboardOverview />} />
+          <Route path="invites" element={<SuperAdminGuard><AdminInvitesPage /></SuperAdminGuard>} />
+          <Route path="approvals" element={<SuperAdminGuard><AdminApprovalPage /></SuperAdminGuard>} />
+          <Route path="audit" element={<SuperAdminGuard><div>Audit Log (Coming Soon)</div></SuperAdminGuard>} />
           <Route path="users" element={<AdminUserListView />} />
           <Route path="settings" element={<AdminPaymentSettings />} />
-        </Route>
-
-        {/* Junior Admin Dashboard */}
-        <Route path="/admin" element={<JuniorAdminGuard><AdminLayout role="junior" /></JuniorAdminGuard>}>
-          <Route path="junior" element={<AdminDashboardOverview role="junior" />} />
-          <Route path="users" element={<AdminUserListView />} />
           <Route path="deposits" element={<div>Deposits (Coming Soon)</div>} />
           <Route path="withdrawals" element={<div>Withdrawals (Coming Soon)</div>} />
-          <Route path="settings" element={<AdminPaymentSettings />} />
         </Route>
 
 
