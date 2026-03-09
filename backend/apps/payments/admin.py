@@ -251,6 +251,18 @@ class WithdrawalAdmin(admin.ModelAdmin):
     actions = ['approve_withdrawals', 'reject_withdrawals']
     ordering = ['-created_at']
     
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser or request.user.is_admin:
+            return qs
+        if request.user.is_agent:
+            return qs.filter(user__referred_by=request.user)
+        return qs.none()
+    
+    def user_email(self, obj):
+        return obj.user.email
+    user_email.short_description = 'User'
+    
     def amount_display(self, obj):
         usd = f'${float(obj.amount_usdt):.6f}'
         if obj.amount_ngn:
@@ -259,14 +271,123 @@ class WithdrawalAdmin(admin.ModelAdmin):
         return format_html('<strong>{}</strong>', usd)
     amount_display.short_description = 'Amount'
 
+    def _process_withdrawal_approval(self, request, withdrawal):
+        from apps.users.models import Notification
+        user = withdrawal.user
+        
+        # Check correct balance based on source
+        if withdrawal.is_referral:
+            if user.referral_balance_usdt >= withdrawal.amount_usdt:
+                user.referral_balance_usdt -= Decimal(str(withdrawal.amount_usdt))
+                user.save()
+                
+                withdrawal.status = 'approved'
+                withdrawal.reviewed_at = timezone.now()
+                withdrawal.save()
+                
+                Notification.objects.create(
+                    user=user,
+                    type='referral',
+                    title='💸 Referral Reward Withdrawn!',
+                    message=f'Your referral reward withdrawal of ${float(withdrawal.amount_usdt):.2f} USDT has been approved.',
+                    icon='✅'
+                )
+                return True, f'✅ Approved Referral WD for {user.email}'
+            else:
+                return False, f'❌ {user.email} has insufficient referral balance!'
+        else:
+            # Standard mining balance withdrawal
+            if user.balance_usdt >= withdrawal.amount_usdt:
+                user.balance_usdt -= Decimal(str(withdrawal.amount_usdt))
+                if withdrawal.amount_ngn:
+                    user.balance_ngn -= Decimal(str(withdrawal.amount_ngn))
+                user.save()
+                
+                withdrawal.status = 'approved'
+                withdrawal.reviewed_at = timezone.now()
+                withdrawal.save()
+                
+                Notification.objects.create(
+                    user=user,
+                    type='withdrawal',
+                    title='💸 Withdrawal Approved!',
+                    message=f'Your withdrawal of ${float(withdrawal.amount_usdt):.2f} USDT has been approved.',
+                    icon='✅'
+                )
+                return True, f'✅ Approved {user.email}'
+            else:
+                return False, f'❌ {user.email} has insufficient mining balance!'
+
+    def _process_withdrawal_rejection(self, request, withdrawal):
+        from apps.users.models import Notification
+        withdrawal.status = 'rejected'
+        withdrawal.reviewed_at = timezone.now()
+        withdrawal.save()
+        
+        Notification.objects.create(
+            user=withdrawal.user,
+            type='withdrawal',
+            title='❌ Withdrawal Rejected',
+            message='Your withdrawal request was rejected. Contact support.',
+            icon='❌'
+        )
+        return True, 'Rejected'
+
+    def approve_withdrawals(self, request, queryset):
+        """Approve withdrawals and deduct from balance"""
+        count = 0
+        for withdrawal in queryset.filter(status='pending'):
+            success, msg = self._process_withdrawal_approval(request, withdrawal)
+            if success:
+                count += 1
+                self.message_user(request, msg, level=messages.SUCCESS)
+            else:
+                self.message_user(request, msg, level=messages.ERROR)
+        if count > 0:
+            self.message_user(request, f'Successfully approved {count} withdrawals.', level=messages.SUCCESS)
+    approve_withdrawals.short_description = '✅ Approve Withdrawals'
+    
+    def reject_withdrawals(self, request, queryset):
+        """Reject withdrawals"""
+        count = 0
+        for withdrawal in queryset.filter(status='pending'):
+            success, _ = self._process_withdrawal_rejection(request, withdrawal)
+            if success: count += 1
+        self.message_user(request, f'❌ Rejected {count} withdrawals', level=messages.WARNING)
+    reject_withdrawals.short_description = '❌ Reject Withdrawals'
+
+    def save_model(self, request, obj, form, change):
+        """Handle individual saves from the edit page"""
+        if change and 'status' in form.changed_data:
+            original_obj = Withdrawal.objects.get(pk=obj.pk)
+            if original_obj.status == 'pending':
+                target_status = form.cleaned_data['status']
+                if target_status == 'approved':
+                    success, msg = self._process_withdrawal_approval(request, obj)
+                    if success:
+                        self.message_user(request, msg, level=messages.SUCCESS)
+                    else:
+                        self.message_user(request, msg, level=messages.ERROR)
+                    return
+                elif target_status == 'rejected':
+                    self._process_withdrawal_rejection(request, obj)
+                    self.message_user(request, f'❌ Withdrawal rejected', level=messages.WARNING)
+                    return
+
+        super().save_model(request, obj, form, change)
+
+
 @admin.register(ReferralWithdrawal)
 class ReferralWithdrawalAdmin(WithdrawalAdmin):
     """Specialized monitor for referral earnings withdrawals ONLY"""
     verbose_name = 'Referral Withdrawal Monitor'
     
     def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        return qs.filter(is_referral=True)
+        # We override WithdrawalAdmin's filtered queryset to show ONLY referrals
+        # But we still want to respect the Super Admin vs Agent filtering if needed
+        # Actually, for the global monitor, just showing referrals is the goal.
+        qs = Withdrawal.objects.filter(is_referral=True)
+        return qs
     
     def get_model_perms(self, request):
         # Only Super Admins and Admins can see this monitor
