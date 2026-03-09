@@ -251,7 +251,7 @@ export const ReferralPage = () => {
             Invite Friends, Earn More
           </h3>
           <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, marginBottom: '16px' }}>
-            Earn <strong>10% commission</strong> on every deposit made by users you refer.
+            Earn <strong>fixed USDT rewards</strong> every time someone you refer upgrades their mining plan.
           </p>
 
           {/* Referral link */}
@@ -267,15 +267,46 @@ export const ReferralPage = () => {
 
         {/* Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '20px' }}>
-          {[
-            { label: 'Total Referrals', value: data?.total_referrals || 0, color: 'var(--apex-blue)' },
-            { label: 'Commission Earned', value: `$${parseFloat(data?.total_commission || 0).toFixed(2)}`, color: 'var(--apex-gold)' },
-          ].map((stat) => (
-            <div key={stat.label} style={{ background: 'var(--apex-card)', border: '1px solid var(--apex-border)', borderRadius: '18px', padding: '18px', textAlign: 'center' }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '26px', fontWeight: 800, color: stat.color, marginBottom: '4px' }}>{stat.value}</div>
-              <div style={{ fontSize: '12px', color: 'var(--apex-muted)' }}>{stat.label}</div>
+          <div style={{ background: 'var(--apex-card)', border: '1px solid var(--apex-border)', borderRadius: '18px', padding: '18px', textAlign: 'center' }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '26px', fontWeight: 800, color: 'var(--apex-blue)', marginBottom: '4px' }}>
+              {data?.total_referrals || 0}
             </div>
-          ))}
+            <div style={{ fontSize: '12px', color: 'var(--apex-muted)' }}>Total Referrals</div>
+          </div>
+
+          <div style={{
+            background: 'var(--apex-card)',
+            border: '1px solid var(--apex-border)',
+            borderRadius: '18px',
+            padding: '18px',
+            textAlign: 'center',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '26px', fontWeight: 800, color: 'var(--apex-gold)', marginBottom: '4px' }}>
+              ${parseFloat(data?.referral_balance || 0).toFixed(2)}
+            </div>
+            <div style={{ fontSize: '11px', color: 'var(--apex-muted)', marginBottom: '10px' }}>Referral Balance</div>
+
+            <button
+              onClick={() => navigate('/referral-withdraw')}
+              disabled={parseFloat(data?.referral_balance || 0) < 5}
+              style={{
+                width: '100%',
+                padding: '8px',
+                background: parseFloat(data?.referral_balance || 0) >= 5 ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'var(--apex-navy)',
+                border: 'none',
+                borderRadius: '10px',
+                color: parseFloat(data?.referral_balance || 0) >= 5 ? '#000' : 'var(--apex-muted)',
+                fontSize: '11px',
+                fontWeight: 800,
+                cursor: parseFloat(data?.referral_balance || 0) >= 5 ? 'pointer' : 'not-allowed',
+                boxShadow: parseFloat(data?.referral_balance || 0) >= 5 ? '0 4px 12px rgba(255, 215, 0, 0.2)' : 'none',
+              }}
+            >
+              Withdraw Earnings
+            </button>
+          </div>
         </div>
 
         {/* How it works */}
@@ -285,7 +316,7 @@ export const ReferralPage = () => {
             {[
               'Share your unique referral link with friends and family',
               'They register using your link and upgrade their account',
-              'You instantly receive 10% commission credited to your balance',
+              'You instantly receive the USDT commission reward for that plan',
             ].map((step, i) => (
               <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
                 <div style={{ minWidth: '32px', height: '32px', background: 'rgba(26,111,255,0.15)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 700, color: 'var(--apex-blue)' }}>

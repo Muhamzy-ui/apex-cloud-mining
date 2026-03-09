@@ -646,6 +646,45 @@ export const ProfilePage = () => {
           </svg>
         </div>
 
+        {/* Referral Program */}
+        <div
+          onClick={() => navigate('/referral')}
+          style={{
+            padding: '16px 0',
+            borderBottom: '1px solid var(--apex-border)',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{
+              width: 40,
+              height: 40,
+              background: 'rgba(255, 171, 0, 0.1)',
+              borderRadius: 10,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--apex-gold)" strokeWidth="2" width="20" height="20">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </div>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 600 }}>Referral Program</div>
+              <div style={{ fontSize: 12, color: 'var(--apex-muted)' }}>Earn USDT by inviting friends</div>
+            </div>
+          </div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--apex-muted)" strokeWidth="2" width="18" height="18">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </div>
+
         {/* History */}
         <div
           onClick={() => navigate('/history')}
@@ -682,55 +721,6 @@ export const ProfilePage = () => {
           </svg>
         </div>
       </Card>
-
-      {/* Referral (Admin Only) */}
-      {user?.is_admin && (
-        <Card style={{ marginBottom: 20 }}>
-          <SectionTitle>Referral Link (Admin)</SectionTitle>
-          <div style={{
-            background: 'var(--apex-navy)',
-            border: '1px solid var(--apex-border)',
-            borderRadius: 12,
-            padding: 14,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-          }}>
-            <input
-              type="text"
-              value={`https://apex-mining.com/ref/${user.referral_code}`}
-              readOnly
-              style={{
-                flex: 1,
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--apex-blue)',
-                fontSize: 13,
-                fontFamily: 'monospace',
-                outline: 'none',
-              }}
-            />
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(`https://apex-mining.com/ref/${user.referral_code}`);
-                toast.success('Link copied!');
-              }}
-              style={{
-                background: 'var(--apex-blue)',
-                border: 'none',
-                borderRadius: 8,
-                padding: '8px 14px',
-                color: '#fff',
-                fontSize: 12,
-                fontWeight: 700,
-                cursor: 'pointer',
-              }}
-            >
-              Copy
-            </button>
-          </div>
-        </Card>
-      )}
 
       {/* Theme */}
       <Card style={{ marginBottom: 20 }}>

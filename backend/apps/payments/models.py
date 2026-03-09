@@ -69,6 +69,7 @@ class Withdrawal(models.Model):
         choices=[('pending', 'Pending'), ('processing', 'Processing'), ('approved', 'Approved'), ('rejected', 'Rejected')],
         default='pending'
     )
+    is_referral = models.BooleanField(default=False, verbose_name='Is Referral Withdrawal')
     
     # Transaction details
     transaction_id = models.CharField(max_length=100, blank=True, unique=True)
@@ -171,6 +172,20 @@ class PaymentSettings(models.Model):
         """Get or create payment settings"""
         obj, created = cls.objects.get_or_create(pk=1)
         return obj
+
+class ReferralDeposit(Deposit):
+    """Proxy model for monitoring deposits from referred users only"""
+    class Meta:
+        proxy = True
+        verbose_name = 'Referral Activity (Deposit)'
+        verbose_name_plural = 'Referral Activity (Deposits)'
+
+class ReferralWithdrawal(Withdrawal):
+    """Proxy model for monitoring referral-only withdrawals"""
+    class Meta:
+        proxy = True
+        verbose_name = 'Referral Activity (Withdrawal)'
+        verbose_name_plural = 'Referral Activity (Withdrawals)'
 class WithdrawalFeePayment(models.Model):
     """Track withdrawal fee payments - users must pay before they can withdraw"""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

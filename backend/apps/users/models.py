@@ -41,6 +41,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     tier = models.PositiveIntegerField(default=1)
     tier_expiry = models.DateTimeField(null=True, blank=True)
     balance_usdt = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0'))
+    referral_balance_usdt = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0'), verbose_name='Referral Balance (USDT)')
     balance_ngn = models.DecimalField(max_digits=20, decimal_places=2, default=Decimal('0'))
     total_earned = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0'))
     last_mined_at = models.DateTimeField(null=True, blank=True, verbose_name='Last Mining Time')
@@ -146,13 +147,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     # ==================== PROPERTIES ====================
 
     @property
-    def can_withdraw(self):
-        """
-        Check if user can withdraw:
-        - Tier 5: Allowed unconditionally (no withdrawal fee)
-        - Other tiers: Must have paid withdrawal fee
-        - Tier 1 only: Must also have 100 USDT minimum
-        """
+    def can_withdraw_mining(self):
+        """Standard mining balance withdrawal rules"""
         if self.tier == 5:
             return True
 
@@ -163,6 +159,11 @@ class User(AbstractBaseUser, PermissionsMixin):
             return self.balance_usdt >= Decimal('100.00')
 
         return True
+
+    @property
+    def can_withdraw_referral(self):
+        """Referral balance withdrawal rules (no fee, but maybe a minimum)"""
+        return self.referral_balance_usdt >= Decimal('5.00') # Example minimum
 
     @property
     def can_pay_withdrawal_fee(self):

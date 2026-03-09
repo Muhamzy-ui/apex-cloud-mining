@@ -7,15 +7,15 @@ from .models import MiningTier, UserMiningSession, MiningEarning
 
 @admin.register(MiningTier)
 class MiningTierAdmin(admin.ModelAdmin):
-    list_display = ['tier_number', 'name', 'price_display', 'earn_display', 'withdrawal_fee_display', 'duration_days']
+    list_display = ['tier_number', 'name', 'price_display', 'earn_display', 'withdrawal_fee_display', 'referral_reward_display', 'duration_days']
     ordering = ['tier_number']
     
     fieldsets = (
         ('Plan Info', {
             'fields': ('tier_number', 'name', 'duration_days')
         }),
-        ('Pricing', {
-            'fields': ('price_usd', 'earn_per_24h_usd', 'withdrawal_fee_usd')
+        ('Pricing & Rewards', {
+            'fields': ('price_usd', 'earn_per_24h_usd', 'withdrawal_fee_usd', 'referral_reward')
         }),
     )
     
@@ -30,6 +30,10 @@ class MiningTierAdmin(admin.ModelAdmin):
     def withdrawal_fee_display(self, obj):
         return f'${float(obj.withdrawal_fee_usd):.2f}'
     withdrawal_fee_display.short_description = 'Withdrawal Fee'
+
+    def referral_reward_display(self, obj):
+        return f'${float(obj.referral_reward):.2f}'
+    referral_reward_display.short_description = 'Ref Reward'
 
 
 @admin.register(UserMiningSession)

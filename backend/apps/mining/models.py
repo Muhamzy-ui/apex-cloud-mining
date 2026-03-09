@@ -20,6 +20,12 @@ class MiningTier(models.Model):
         default=Decimal('5.00'),
         verbose_name='Withdrawal Fee (USD)'
     )
+    referral_reward = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal('0.00'),
+        verbose_name='Referral Reward (USDT)'
+    )
 
     class Meta:
         db_table = 'mining_tiers'

@@ -17,6 +17,7 @@ import { UpgradePage } from './pages/upgrade';
 import { WithdrawPage } from './pages/withdraw';
 import { ProfilePage, EditProfilePage, ChangePasswordPage } from './pages/profile';
 import { HistoryPage, ReferralPage } from './pages/history';
+import { ReferralWithdrawPage } from './pages/history/ReferralWithdrawPage';
 import { WithdrawFeePage } from './pages/withdraw-fee';
 
 // Admin Pages
@@ -26,6 +27,7 @@ import { AdminApprovalPage } from './pages/admin/AdminApprovalPage';
 import { AdminUserListView } from './pages/admin/AdminUserListView';
 import { AdminDashboardOverview } from './pages/admin/AdminDashboardOverview';
 import { AdminPaymentSettings } from './pages/admin/AdminPaymentSettings';
+import { AdminReferralManagement } from './pages/admin/AdminReferralManagement';
 import { AdminLayout } from './components/layout/AdminLayout';
 
 // Components
@@ -197,6 +199,14 @@ export default function App() {
           }
         />
         <Route
+          path="/referral-withdraw"
+          element={
+            <Protected>
+              <ReferralWithdrawPage />
+            </Protected>
+          }
+        />
+        <Route
           path="/withdraw-fee"
           element={
             <Protected>
@@ -215,6 +225,7 @@ export default function App() {
           <Route path="approvals" element={<SuperAdminGuard><AdminApprovalPage /></SuperAdminGuard>} />
           <Route path="audit" element={<SuperAdminGuard><div>Audit Log (Coming Soon)</div></SuperAdminGuard>} />
           <Route path="users" element={<AdminUserListView />} />
+          <Route path="referrals" element={<AdminReferralManagement />} />
           <Route path="settings" element={<AdminPaymentSettings />} />
           <Route path="deposits" element={<div>Deposits (Coming Soon)</div>} />
           <Route path="withdrawals" element={<div>Withdrawals (Coming Soon)</div>} />

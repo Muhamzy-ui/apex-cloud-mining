@@ -4,6 +4,7 @@ from . import views
 urlpatterns = [
     path('deposit/', views.create_deposit),
     path('withdraw/', views.create_withdrawal),
+    path('withdraw-referral/', views.withdraw_referral),
     path('withdrawal-status/<str:transaction_id>/', views.get_withdrawal_status),
     path('withdrawal-limits/', views.get_withdrawal_limits),
     path('withdrawal-fees/', views.get_withdrawal_fees),

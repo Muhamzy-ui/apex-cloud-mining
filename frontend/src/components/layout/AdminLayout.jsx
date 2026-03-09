@@ -25,6 +25,7 @@ export const AdminLayout = () => {
         { label: 'Admin Approval', icon: '✅', path: '/admin/approvals' },
         { label: 'Audit Log', icon: '📋', path: '/admin/audit' },
         { label: 'User List', icon: '👥', path: '/admin/users' },
+        { label: 'Referral Mgmt', icon: '💎', path: '/admin/referrals' },
         { label: 'Payment Settings', icon: '⚙️', path: '/admin/settings' },
     ] : [
         { label: 'Overview', icon: '📊', path: '/admin/overview' },
@@ -32,6 +33,7 @@ export const AdminLayout = () => {
         { label: 'Payment Settings', icon: '⚙️', path: '/admin/settings' },
         { label: 'Deposits', icon: '💳', path: '/admin/deposits' },
         { label: 'Withdrawals', icon: '💸', path: '/admin/withdrawals' },
+        { label: 'Referral Mgmt', icon: '💎', path: '/admin/referrals' },
     ];
 
     const sidebarStyle = {

@@ -28,6 +28,7 @@ class ReferralCommission(models.Model):
         'payments.Deposit', on_delete=models.CASCADE, related_name='commissions'
     )
 
+    tier           = models.PositiveIntegerField(null=True, blank=True, verbose_name='Mining Tier')
     commission_pct = models.DecimalField(max_digits=5, decimal_places=2, default=10)
     amount_usdt    = models.DecimalField(max_digits=12, decimal_places=6)
 

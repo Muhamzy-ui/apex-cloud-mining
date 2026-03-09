@@ -235,8 +235,12 @@ export const adminAPI = {
   createInvite: (data) => apiClient.post('/users/admin/invites/create/', data),
   getInvites: () => apiClient.get('/users/admin/invites/'),
 
-  // Super Admin only: Global Commissions & Audit
-  getGlobalCommissions: () => apiClient.get('/admin/commissions/'),
+  // Referral & Commissions
+  getReferralActivity: (params) => apiClient.get('/referrals/admin/activity/', { params }),
+  referralAction: (data) => apiClient.post('/referrals/admin/action/', data),
+  getGlobalCommissions: () => apiClient.get('/referrals/global/'),
+
+  // Audit
   getAuditLogs: (params) => apiClient.get('/admin/audit-log/', { params }),
 
   // Misc

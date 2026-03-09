@@ -102,6 +102,59 @@ def create_withdrawal(request):
     }, status=status.HTTP_201_CREATED)
 
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def withdraw_referral(request):
+    """Specialized withdrawal for isolated referral balance (fee-free)"""
+    user = request.user
+    
+    amount_usdt = Decimal(str(request.data.get('amount_usdt', 0)))
+    method = request.data.get('method', 'crypto')
+    
+    # 1. Validation
+    if amount_usdt < Decimal('5.00'): # Lower minimum for referrals
+        return Response(
+            {'detail': 'Minimum referral withdrawal is $5 USDT'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    if amount_usdt > user.referral_balance_usdt:
+        return Response(
+            {'detail': 'Insufficient referral balance'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    # 2. Get exchange rate
+    try:
+        rate = ExchangeRate.objects.first()
+        amount_ngn = amount_usdt * Decimal(str(rate.usd_to_ngn)) if rate else None
+    except:
+        amount_ngn = None
+    
+    # 3. Create withdrawal (flagged as is_referral=True)
+    withdrawal = Withdrawal.objects.create(
+        user=user,
+        amount_usdt=amount_usdt,
+        amount_ngn=amount_ngn,
+        method=method,
+        is_referral=True, # Critical flag
+        wallet_address=request.data.get('wallet_address', ''),
+        bank_name=request.data.get('bank_name', ''),
+        account_number=request.data.get('account_number', ''),
+        account_name=request.data.get('account_name', ''),
+    )
+    
+    # Note: Balance is deducted only upon Admin approval in admin.py helper.
+    # We follow the same pattern as create_withdrawal here.
+    
+    return Response({
+        'message': 'Referral withdrawal submitted! No transfer fee required.',
+        'transaction_id': withdrawal.transaction_id,
+        'amount_usdt': float(amount_usdt),
+        'status': 'pending'
+    }, status=status.HTTP_201_CREATED)
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_withdrawal_status(request, transaction_id):
