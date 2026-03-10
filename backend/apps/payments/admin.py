@@ -91,6 +91,7 @@ class DepositAdmin(admin.ModelAdmin):
         unique_together on (deposit, referrer) prevents double-crediting.
         """
         from apps.referrals.models import ReferralCommission, AdminCommissionSummary
+        from apps.mining.models import MiningTier
         from apps.users.models import Notification
         from django.db.models import F
 
