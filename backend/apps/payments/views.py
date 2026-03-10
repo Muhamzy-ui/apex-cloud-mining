@@ -52,7 +52,7 @@ def create_withdrawal(request):
     user = request.user
     
     # Check if withdrawals are enabled
-    if not user.can_withdraw:
+    if not user.can_withdraw_mining:
         return Response(
             {'detail': 'Withdrawals not available. Please upgrade or reach minimum balance.'},
             status=status.HTTP_400_BAD_REQUEST
@@ -107,6 +107,13 @@ def create_withdrawal(request):
 def withdraw_referral(request):
     """Specialized withdrawal for isolated referral balance (fee-free)"""
     user = request.user
+    
+    # 0. Check if withdrawals are enabled
+    if not user.can_withdraw_referral:
+        return Response(
+            {'detail': f'Minimum referral withdrawal is $10.00 USDT. Current: ${float(user.referral_balance_usdt):.2f}'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
     
     amount_usdt = Decimal(str(request.data.get('amount_usdt', 0)))
     method = request.data.get('method', 'crypto')
@@ -203,7 +210,8 @@ def get_withdrawal_limits(request):
         'min_withdrawal_usd': tier_limits['min'],
         'max_withdrawal_usd': tier_limits['max'],
         'balance_usdt': float(user.balance_usdt),
-        'can_withdraw': user.can_withdraw,
+        'can_withdraw': user.can_withdraw_mining,
+        'can_withdraw_referral': user.can_withdraw_referral,
     })
 
 

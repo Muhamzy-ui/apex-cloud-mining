@@ -7,7 +7,9 @@ from .models import User
 
 class UserSerializer(serializers.ModelSerializer):
     """User serializer with all fields"""
-    can_withdraw = serializers.ReadOnlyField()
+    can_withdraw = serializers.ReadOnlyField(source='can_withdraw_mining')
+    can_withdraw_mining = serializers.ReadOnlyField()
+    can_withdraw_referral = serializers.ReadOnlyField()
     can_mine = serializers.ReadOnlyField()
     mining_cooldown_remaining = serializers.ReadOnlyField()
     tier_expiry_countdown = serializers.ReadOnlyField()
@@ -16,10 +18,11 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'id', 'email', 'full_name', 'phone', 'country', 'avatar',
-            'tier', 'tier_expiry', 'balance_usdt', 'balance_ngn', 'total_earned',
+            'tier', 'tier_expiry', 'balance_usdt', 'balance_ngn', 'referral_balance_usdt', 'total_earned',
             'last_mined_at', 'trc20_wallet', 'referral_code', 'referred_by',
             'withdrawal_fee_paid', 'is_admin', 'is_verified', 'is_agent',
-            'date_joined', 'can_withdraw', 'can_mine', 'mining_cooldown_remaining',
+            'date_joined', 'can_withdraw', 'can_withdraw_mining', 'can_withdraw_referral', 
+            'can_mine', 'mining_cooldown_remaining',
             'tier_expiry_countdown',
             'agent_wallet_usdt', 'agent_bank_name', 'agent_account_name', 'agent_account_number'
         ]
@@ -31,7 +34,9 @@ class UserSerializer(serializers.ModelSerializer):
 
 class DashboardSerializer(serializers.ModelSerializer):
     """Dashboard data with computed properties"""
-    can_withdraw = serializers.ReadOnlyField()
+    can_withdraw = serializers.ReadOnlyField(source='can_withdraw_mining')
+    can_withdraw_mining = serializers.ReadOnlyField()
+    can_withdraw_referral = serializers.ReadOnlyField()
     can_mine = serializers.ReadOnlyField()
     mining_cooldown_remaining = serializers.ReadOnlyField()
     tier_expiry_countdown = serializers.ReadOnlyField()
@@ -40,10 +45,10 @@ class DashboardSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'id', 'email', 'full_name', 'tier', 'tier_expiry',
-            'balance_usdt', 'balance_ngn', 'total_earned',
+            'balance_usdt', 'balance_ngn', 'referral_balance_usdt', 'total_earned',
             'trc20_wallet', 'last_mined_at', 'withdrawal_fee_paid',
-            'referral_code', 'can_withdraw', 'can_mine',
-            'mining_cooldown_remaining', 'tier_expiry_countdown'
+            'referral_code', 'can_withdraw', 'can_withdraw_mining', 'can_withdraw_referral',
+            'can_mine', 'mining_cooldown_remaining', 'tier_expiry_countdown'
         ]
 
 

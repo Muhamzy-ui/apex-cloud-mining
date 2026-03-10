@@ -221,7 +221,7 @@ export const WithdrawPage = () => {
     account_name: '',
   });
 
-  const canWithdraw = user?.can_withdraw || false;
+  const canWithdraw = user?.can_withdraw_mining || false;
   const withdrawalFeePaid = user?.withdrawal_fee_paid || false;
   const balance = parseFloat(user?.balance_usdt || 0);
   const amount = parseFloat(form.amount) || 0;
