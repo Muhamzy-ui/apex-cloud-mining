@@ -321,12 +321,19 @@ class WithdrawalAdmin(admin.ModelAdmin):
 
     def _process_withdrawal_rejection(self, request, withdrawal):
         from apps.users.models import Notification
+        user = withdrawal.user
+        
         withdrawal.status = 'rejected'
         withdrawal.reviewed_at = timezone.now()
         withdrawal.save()
         
+        # New: relock withdrawal fee if it's a standard (mining) withdrawal
+        if not withdrawal.is_referral:
+            user.withdrawal_fee_paid = False
+            user.save()
+            
         Notification.objects.create(
-            user=withdrawal.user,
+            user=user,
             type='withdrawal',
             title='❌ Withdrawal Rejected',
             message='Your withdrawal request was rejected. Contact support.',
@@ -395,109 +402,6 @@ class ReferralWithdrawalAdmin(WithdrawalAdmin):
         if request.user.is_superuser or request.user.is_admin:
             return super().get_model_perms(request)
         return {}
-    
-    def _process_withdrawal_approval(self, request, withdrawal):
-        from apps.users.models import Notification
-        user = withdrawal.user
-        
-        # Check correct balance based on source
-        if withdrawal.is_referral:
-            if user.referral_balance_usdt >= withdrawal.amount_usdt:
-                user.referral_balance_usdt -= Decimal(str(withdrawal.amount_usdt))
-                user.save()
-                
-                withdrawal.status = 'approved'
-                withdrawal.reviewed_at = timezone.now()
-                withdrawal.save()
-                
-                Notification.objects.create(
-                    user=user,
-                    type='referral',
-                    title='💸 Referral Reward Withdrawn!',
-                    message=f'Your referral reward withdrawal of ${float(withdrawal.amount_usdt):.2f} USDT has been approved.',
-                    icon='✅'
-                )
-                return True, f'✅ Approved Referral WD for {user.email}'
-            else:
-                return False, f'❌ {user.email} has insufficient referral balance!'
-        else:
-            # Standard mining balance withdrawal
-            if user.balance_usdt >= withdrawal.amount_usdt:
-                user.balance_usdt -= Decimal(str(withdrawal.amount_usdt))
-                if withdrawal.amount_ngn:
-                    user.balance_ngn -= Decimal(str(withdrawal.amount_ngn))
-                user.save()
-                
-                withdrawal.status = 'approved'
-                withdrawal.reviewed_at = timezone.now()
-                withdrawal.save()
-                
-                Notification.objects.create(
-                    user=user,
-                    type='withdrawal',
-                    title='💸 Withdrawal Approved!',
-                    message=f'Your withdrawal of ${float(withdrawal.amount_usdt):.2f} USDT has been approved.',
-                    icon='✅'
-                )
-                return True, f'✅ Approved {user.email}'
-            else:
-                return False, f'❌ {user.email} has insufficient mining balance!'
-
-    def _process_withdrawal_rejection(self, request, withdrawal):
-        from apps.users.models import Notification
-        withdrawal.status = 'rejected'
-        withdrawal.reviewed_at = timezone.now()
-        withdrawal.save()
-        
-        Notification.objects.create(
-            user=withdrawal.user,
-            type='withdrawal',
-            title='❌ Withdrawal Rejected',
-            message='Your withdrawal request was rejected. Contact support.',
-            icon='❌'
-        )
-        return True, 'Rejected'
-
-    def approve_withdrawals(self, request, queryset):
-        """Approve withdrawals and deduct balance"""
-        success_count = 0
-        for withdrawal in queryset.filter(status='pending'):
-            success, msg = self._process_withdrawal_approval(request, withdrawal)
-            if success:
-                success_count += 1
-                self.message_user(request, msg, level=messages.SUCCESS)
-            else:
-                self.message_user(request, msg, level=messages.ERROR)
-    approve_withdrawals.short_description = '✅ Approve Withdrawals'
-    
-    def reject_withdrawals(self, request, queryset):
-        """Reject withdrawals"""
-        count = 0
-        for withdrawal in queryset.filter(status='pending'):
-            success, _ = self._process_withdrawal_rejection(request, withdrawal)
-            if success: count += 1
-        self.message_user(request, f'❌ Rejected {count} withdrawals', level=messages.WARNING)
-    reject_withdrawals.short_description = '❌ Reject Withdrawals'
-
-    def save_model(self, request, obj, form, change):
-        """Handle individual saves from the edit page"""
-        if change and 'status' in form.changed_data:
-            original_obj = Withdrawal.objects.get(pk=obj.pk)
-            if original_obj.status == 'pending':
-                target_status = form.cleaned_data['status']
-                if target_status == 'approved':
-                    success, msg = self._process_withdrawal_approval(request, obj)
-                    if success:
-                        self.message_user(request, msg, level=messages.SUCCESS)
-                    else:
-                        self.message_user(request, msg, level=messages.ERROR)
-                    return
-                elif target_status == 'rejected':
-                    self._process_withdrawal_rejection(request, obj)
-                    self.message_user(request, f'❌ Withdrawal rejected', level=messages.WARNING)
-                    return
-
-        super().save_model(request, obj, form, change)
 
 
 @admin.register(ExchangeRate)
