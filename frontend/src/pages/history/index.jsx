@@ -266,7 +266,8 @@ export const ReferralPage = () => {
         </div>
 
         {/* Stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '20px' }}>
+        {/* Stats */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
           <div style={{ background: 'var(--apex-card)', border: '1px solid var(--apex-border)', borderRadius: '18px', padding: '18px', textAlign: 'center' }}>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '26px', fontWeight: 800, color: 'var(--apex-blue)', marginBottom: '4px' }}>
               {data?.total_referrals || 0}
@@ -280,34 +281,55 @@ export const ReferralPage = () => {
             borderRadius: '18px',
             padding: '18px',
             textAlign: 'center',
-            position: 'relative',
-            overflow: 'hidden'
           }}>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '26px', fontWeight: 800, color: 'var(--apex-gold)', marginBottom: '4px' }}>
               ${parseFloat(data?.referral_balance || 0).toFixed(2)}
             </div>
-            <div style={{ fontSize: '11px', color: 'var(--apex-muted)', marginBottom: '10px' }}>Referral Balance</div>
-
-            <button
-              onClick={() => navigate('/referral-withdraw')}
-              disabled={parseFloat(data?.referral_balance || 0) < 5}
-              style={{
-                width: '100%',
-                padding: '8px',
-                background: parseFloat(data?.referral_balance || 0) >= 5 ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'var(--apex-navy)',
-                border: 'none',
-                borderRadius: '10px',
-                color: parseFloat(data?.referral_balance || 0) >= 5 ? '#000' : 'var(--apex-muted)',
-                fontSize: '11px',
-                fontWeight: 800,
-                cursor: parseFloat(data?.referral_balance || 0) >= 5 ? 'pointer' : 'not-allowed',
-                boxShadow: parseFloat(data?.referral_balance || 0) >= 5 ? '0 4px 12px rgba(255, 215, 0, 0.2)' : 'none',
-              }}
-            >
-              Withdraw Earnings
-            </button>
+            <div style={{ fontSize: '11px', color: 'var(--apex-muted)' }}>Referral Balance</div>
           </div>
         </div>
+
+        {/* Dynamic Warning */}
+        {parseFloat(data?.referral_balance || 0) >= 5 && parseFloat(data?.referral_balance || 0) < 10 && (
+          <div style={{
+            background: 'rgba(245, 166, 35, 0.1)',
+            border: '1px solid rgba(245, 166, 35, 0.3)',
+            borderRadius: '14px',
+            padding: '12px 16px',
+            marginBottom: '16px',
+            fontSize: '12px',
+            color: 'var(--apex-gold)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px'
+          }}>
+            <span>⚠️</span>
+            <span>Minimum withdrawal for referral earnings is <strong>$10.00</strong></span>
+          </div>
+        )}
+
+        {/* Global Withdraw Button */}
+        <button
+          onClick={() => navigate('/referral-withdraw')}
+          disabled={parseFloat(data?.referral_balance || 0) < 10}
+          style={{
+            width: '100%',
+            padding: '16px',
+            background: parseFloat(data?.referral_balance || 0) >= 10 ? 'linear-gradient(135deg, var(--apex-blue), #0044DD)' : 'var(--apex-card)',
+            border: parseFloat(data?.referral_balance || 0) >= 10 ? 'none' : '1px solid var(--apex-border)',
+            borderRadius: '16px',
+            color: parseFloat(data?.referral_balance || 0) >= 10 ? '#fff' : 'var(--apex-muted)',
+            fontFamily: 'var(--font-display)',
+            fontSize: '15px',
+            fontWeight: 800,
+            cursor: parseFloat(data?.referral_balance || 0) >= 10 ? 'pointer' : 'not-allowed',
+            marginBottom: '20px',
+            boxShadow: parseFloat(data?.referral_balance || 0) >= 10 ? '0 8px 20px rgba(26, 111, 255, 0.3)' : 'none',
+            transition: 'all 0.2s',
+          }}
+        >
+          {parseFloat(data?.referral_balance || 0) >= 10 ? '💸 Withdraw Referral Earnings' : `Min. Withdraw: $10.00`}
+        </button>
 
         {/* How it works */}
         <Card style={{ marginBottom: '16px' }}>

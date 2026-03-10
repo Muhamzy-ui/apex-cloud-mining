@@ -94,8 +94,8 @@ export const ReferralWithdrawPage = () => {
         e.preventDefault();
         const amount = parseFloat(form.amount) || 0;
 
-        if (amount < 5) {
-            toast.error('Minimum withdrawal is $5 USDT');
+        if (amount < 10) {
+            toast.error('Minimum withdrawal is $10 USDT');
             return;
         }
 
@@ -244,7 +244,7 @@ export const ReferralWithdrawPage = () => {
 
             <button
                 onClick={handleSubmit}
-                disabled={loading || referralBalance < 5}
+                disabled={loading || referralBalance < 10}
                 style={{
                     width: '100%',
                     padding: '18px',

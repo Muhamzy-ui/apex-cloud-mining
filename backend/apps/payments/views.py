@@ -112,9 +112,9 @@ def withdraw_referral(request):
     method = request.data.get('method', 'crypto')
     
     # 1. Validation
-    if amount_usdt < Decimal('5.00'): # Lower minimum for referrals
+    if amount_usdt < Decimal('10.00'): # New minimum for referrals
         return Response(
-            {'detail': 'Minimum referral withdrawal is $5 USDT'},
+            {'detail': 'Minimum referral withdrawal is $10 USDT'},
             status=status.HTTP_400_BAD_REQUEST
         )
     
