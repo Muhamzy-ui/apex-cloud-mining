@@ -202,7 +202,7 @@ export const WithdrawPage = () => {
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [transaction, setTransaction] = useState(null);
-  const [limits, setLimits] = useState({ min: 10, max: 10000 });
+  const [limits, setLimits] = useState({ min: 100, max: 10000 });
   const [banks, setBanks] = useState([]);
   const [bankSearch, setBankSearch] = useState('');
   const [selectedBank, setSelectedBank] = useState(null);
@@ -235,7 +235,7 @@ export const WithdrawPage = () => {
   const feeNgn = (planTransferFeeUsdt * exchangeRate);
 
   // Safe access to limits
-  const minLimit = limits?.min || 10;
+  const minLimit = limits?.min || 100;
   const maxLimit = limits?.max || 10000;
 
   // Eligibility flags

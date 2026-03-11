@@ -62,9 +62,9 @@ def create_withdrawal(request):
     method = request.data.get('method', 'crypto')
     
     # Validation
-    if amount_usdt < Decimal('10.00'):
+    if amount_usdt < Decimal('100.00'):
         return Response(
-            {'detail': 'Minimum withdrawal is $10 USDT'},
+            {'detail': 'Minimum withdrawal is $100 USDT'},
             status=status.HTTP_400_BAD_REQUEST
         )
     
@@ -197,14 +197,14 @@ def get_withdrawal_limits(request):
     
     # Define limits per tier
     limits = {
-        1: {'min': 10, 'max': 10000},
-        2: {'min': 10, 'max': 10000},
-        3: {'min': 10, 'max': 10000},
-        4: {'min': 10, 'max': 10000},
-        5: {'min': 10, 'max': 10000},
+        1: {'min': 100, 'max': 10000},
+        2: {'min': 100, 'max': 10000},
+        3: {'min': 100, 'max': 10000},
+        4: {'min': 100, 'max': 10000},
+        5: {'min': 100, 'max': 10000},
     }
     
-    tier_limits = limits.get(user.tier, {'min': 10, 'max': 10000})
+    tier_limits = limits.get(user.tier, {'min': 100, 'max': 10000})
     
     return Response({
         'min_withdrawal_usd': tier_limits['min'],
