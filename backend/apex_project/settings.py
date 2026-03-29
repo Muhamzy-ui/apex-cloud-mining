@@ -90,8 +90,8 @@ DATABASES = {
     )
 }
 
-# Supabase requires SSL in production
-if not DEBUG or 'supabase.co' in DATABASES['default'].get('HOST', ''):
+# Database SSL and health checks
+if not DEBUG:
     DATABASES['default']['OPTIONS'] = {
         'sslmode': 'require',
     }
