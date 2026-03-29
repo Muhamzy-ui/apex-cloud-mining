@@ -80,11 +80,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'apex_project.wsgi.application'
 
-# Database
-# Use DATABASE_URL for standard Postgres (Render/Supabase)
+# Database configuration
+db_url = env('DATABASE_URL', default='postgres://postgres:Apex123@localhost:5432/apex_db')
+if db_url.startswith('postgres://'):
+    db_url = db_url.replace('postgres://', 'postgresql://', 1)
+
 DATABASES = {
     'default': dj_database_url.config(
-        default=env('DATABASE_URL', default='postgres://postgres:Apex123@localhost:5432/apex_db'),
+        default=db_url,
         conn_max_age=600,
         conn_health_checks=True,
     )
