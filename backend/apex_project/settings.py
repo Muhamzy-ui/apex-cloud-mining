@@ -81,18 +81,20 @@ TEMPLATES = [
 WSGI_APPLICATION = 'apex_project.wsgi.application'
 
 # Database
+# Use DATABASE_URL for standard Postgres (Render/Supabase)
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('DB_NAME', default='apex_db'),
-        'USER': env('DB_USER', default='postgres'),
-        'PASSWORD': env('DB_PASSWORD', default='Apex123'),
-        'HOST': env('DB_HOST', default='localhost'),
-        'PORT': env('DB_PORT', default='5432'),
-    }
+    'default': dj_database_url.config(
+        default=env('DATABASE_URL', default='postgres://postgres:Apex123@localhost:5432/apex_db'),
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
 
-DATABASES['default'] = dj_database_url.parse(env('DATABASE_URL', default='postgres://postgres:Apex123@localhost:5432/apex_db'), conn_max_age=600)
+# Supabase requires SSL in production
+if not DEBUG or 'supabase.co' in DATABASES['default'].get('HOST', ''):
+    DATABASES['default']['OPTIONS'] = {
+        'sslmode': 'require',
+    }
 # REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
