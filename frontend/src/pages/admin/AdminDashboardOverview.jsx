@@ -64,12 +64,12 @@ export const AdminDashboardOverview = () => {
                     <div style={{ flex: 1 }}>
                         <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--apex-blue)', textTransform: 'uppercase', marginBottom: '4px' }}>Your Referral Link</div>
                         <div style={{ fontSize: '14px', fontWeight: 600, fontFamily: 'monospace', wordBreak: 'break-all' }}>
-                            apex-mining.com/register?ref={user?.referral_code}
+                            {window.location.host}/register?ref={user?.referral_code}
                         </div>
                     </div>
                     <button
                         onClick={() => {
-                            navigator.clipboard.writeText(`https://apex-mining.com/register?ref=${user?.referral_code}`);
+                            navigator.clipboard.writeText(`${window.location.origin}/register?ref=${user?.referral_code}`);
                             toast.success('Referral link copied!');
                         }}
                         className="rounded-lg"

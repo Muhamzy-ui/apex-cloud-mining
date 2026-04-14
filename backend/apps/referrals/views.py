@@ -50,9 +50,17 @@ class ReferralDashboardView(APIView):
         except AdminCommissionSummary.DoesNotExist:
             total_earned = float(commissions.aggregate(total=Sum('amount_usdt'))['total'] or 0)
 
+        from django.conf import settings
+        frontend_url = "https://apex-mining-frontend.vercel.app"
+        try:
+            if hasattr(settings, 'CORS_ALLOWED_ORIGINS') and settings.CORS_ALLOWED_ORIGINS:
+                frontend_url = settings.CORS_ALLOWED_ORIGINS[0]
+        except Exception:
+            pass
+            
         return Response({
             'referral_code':    user.referral_code,
-            'referral_link':    f"https://apex-mining.com/ref/{user.referral_code}",
+            'referral_link':    f"{frontend_url}/register?ref={user.referral_code}",
             'total_referrals':  referred_users.count(),
             'total_earned':     total_earned,
             'referral_balance': float(user.referral_balance_usdt),
