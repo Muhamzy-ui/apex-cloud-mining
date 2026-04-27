@@ -23,6 +23,7 @@ export const AdminLayout = () => {
         { label: 'Overview', icon: '📊', path: '/admin/overview' },
         { label: 'Invitations', icon: '📩', path: '/admin/invites' },
         { label: 'Admin Approval', icon: '✅', path: '/admin/approvals' },
+        { label: 'Network Admins', icon: '👑', path: '/admin/admins' },
         { label: 'Audit Log', icon: '📋', path: '/admin/audit' },
         { label: 'User List', icon: '👥', path: '/admin/users' },
         { label: 'Referral Mgmt', icon: '💎', path: '/admin/referrals' },

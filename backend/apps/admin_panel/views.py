@@ -128,8 +128,15 @@ class AdminUserListView(generics.ListAPIView):
 
     def get_queryset(self):
         if self.request.user.is_superuser:
-            return User.objects.all()
-        return User.objects.filter(referred_by=self.request.user)
+            qs = User.objects.all()
+        else:
+            qs = User.objects.filter(referred_by=self.request.user)
+            
+        is_admin_only = self.request.query_params.get('is_admin_only')
+        if is_admin_only == 'true':
+            qs = qs.filter(is_admin=True, is_superuser=False)
+            
+        return qs
 
 
 class AdminUserDetailView(generics.RetrieveUpdateAPIView):

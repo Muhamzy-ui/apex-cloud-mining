@@ -26,6 +26,7 @@ import { AdminInvitesPage } from './pages/admin/AdminInvitesPage';
 import { AdminApplyPage } from './pages/admin/AdminApplyPage';
 import { AdminApprovalPage } from './pages/admin/AdminApprovalPage';
 import { AdminUserListView } from './pages/admin/AdminUserListView';
+import { AdminAdminsPage } from './pages/admin/AdminAdminsPage';
 import { AdminDashboardOverview } from './pages/admin/AdminDashboardOverview';
 import { AdminPaymentSettings } from './pages/admin/AdminPaymentSettings';
 import { AdminReferralManagement } from './pages/admin/AdminReferralManagement';
@@ -234,6 +235,7 @@ export default function App() {
           <Route path="approvals" element={<SuperAdminGuard><AdminApprovalPage /></SuperAdminGuard>} />
           <Route path="audit" element={<SuperAdminGuard><div>Audit Log (Coming Soon)</div></SuperAdminGuard>} />
           <Route path="users" element={<AdminUserListView />} />
+          <Route path="admins" element={<SuperAdminGuard><AdminAdminsPage /></SuperAdminGuard>} />
           <Route path="referrals" element={<AdminReferralManagement />} />
           <Route path="settings" element={<AdminPaymentSettings />} />
           <Route path="deposits" element={<div>Deposits (Coming Soon)</div>} />

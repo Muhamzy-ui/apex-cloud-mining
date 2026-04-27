@@ -47,10 +47,10 @@ def mine(request):
     
     # Check if plan is active
     if user.tier_expiry and now > user.tier_expiry:
-        return Response({
-            'detail': 'Your plan has expired. Please upgrade.',
-            'can_mine': False
-        }, status=status.HTTP_400_BAD_REQUEST)
+        # Plan expired - Revert to Tier 1
+        user.tier = 1
+        user.tier_expiry = None
+        user.save(update_fields=['tier', 'tier_expiry'])
     
     # Get earnings for current tier
     earn_amount_usd = EARN_PER_DAY.get(user.tier, Decimal('1.00'))
@@ -102,8 +102,10 @@ def mining_status(request):
     # Check expiry
     is_expired = False
     if user.tier_expiry and now > user.tier_expiry:
-        is_expired = True
-        can_mine = False
+        # Plan expired - Revert to Tier 1
+        user.tier = 1
+        user.tier_expiry = None
+        user.save(update_fields=['tier', 'tier_expiry'])
     
     return Response({
         'can_mine': can_mine,

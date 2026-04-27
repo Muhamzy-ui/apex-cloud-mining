@@ -115,6 +115,15 @@ const BOTTOM_ITEMS = [
     )
   },
   {
+    path: '/community',
+    label: 'Community',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="22" height="22">
+        <path d="M21.5 2.5L2.5 10.5L9.5 13.5L18.5 5.5L11.5 14.5L11.5 20.5L15.5 16.5L21.5 2.5Z" />
+      </svg>
+    )
+  },
+  {
     path: '/profile',
     label: 'Profile',
     icon: (
