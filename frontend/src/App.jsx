@@ -19,6 +19,7 @@ import { ProfilePage, EditProfilePage, ChangePasswordPage } from './pages/profil
 import { HistoryPage, ReferralPage } from './pages/history';
 import { ReferralWithdrawPage } from './pages/history/ReferralWithdrawPage';
 import { WithdrawFeePage } from './pages/withdraw-fee';
+import CommunityPage from './pages/community';
 
 // Admin Pages
 import { AdminInvitesPage } from './pages/admin/AdminInvitesPage';
@@ -139,6 +140,14 @@ export default function App() {
           element={
             <Protected>
               <DashboardPage />
+            </Protected>
+          }
+        />
+        <Route
+          path="/community"
+          element={
+            <Protected>
+              <CommunityPage />
             </Protected>
           }
         />

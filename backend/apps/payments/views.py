@@ -246,6 +246,7 @@ def get_payment_settings(request):
         'account_number': account_number,
         'support_url': settings.support_url,
         'support_alt_url': settings.support_alt_url,
+        'telegram_community_url': settings.telegram_community_url,
     })
 
 

@@ -145,6 +145,13 @@ class PaymentSettings(models.Model):
         help_text='Optional secondary support link'
     )
     
+    telegram_community_url = models.URLField(
+        max_length=500,
+        blank=True,
+        default='https://t.me/apexcloudmining',
+        help_text='Link to the official Telegram community channel'
+    )
+    
     # Metadata
     updated_at = models.DateTimeField(auto_now=True)
     updated_by = models.ForeignKey(
