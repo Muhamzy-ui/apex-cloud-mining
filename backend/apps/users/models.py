@@ -77,6 +77,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         default=Decimal('10.00'),
         verbose_name='Agent Commission %'
     )
+    agent_telegram_link = models.URLField(max_length=500, blank=True, verbose_name='Agent Telegram Link')
 
     # Admin Approval Status (for Junior Admin signup flow)
     ADMIN_STATUS_CHOICES = [

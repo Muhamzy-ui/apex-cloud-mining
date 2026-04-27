@@ -11,6 +11,7 @@ export const AdminPaymentSettings = () => {
         agent_bank_name: '',
         agent_account_name: '',
         agent_account_number: '',
+        agent_telegram_link: '',
     });
 
     useEffect(() => {
@@ -20,6 +21,7 @@ export const AdminPaymentSettings = () => {
                 agent_bank_name: user.agent_bank_name || '',
                 agent_account_name: user.agent_account_name || '',
                 agent_account_number: user.agent_account_number || '',
+                agent_telegram_link: user.agent_telegram_link || '',
             });
         }
     }, [user]);
@@ -166,6 +168,33 @@ export const AdminPaymentSettings = () => {
                             placeholder="Enter full name as seen on bank account"
                             value={formData.agent_account_name}
                             onChange={(e) => setFormData({ ...formData, agent_account_name: e.target.value })}
+                        />
+                    </div>
+
+                    {/* Telegram Link */}
+                    <div>
+                        <label
+                            htmlFor="agent_telegram_link"
+                            className="text-muted"
+                            style={{ fontSize: '13px', display: 'block', marginBottom: '8px', fontWeight: 600 }}
+                        >
+                            Telegram Community Link
+                        </label>
+                        <input
+                            id="agent_telegram_link"
+                            name="agent_telegram_link"
+                            type="url"
+                            className="bg-navy rounded-xl"
+                            style={{
+                                width: '100%',
+                                padding: '14px 20px',
+                                border: '1px solid var(--apex-border)',
+                                color: 'var(--apex-text)',
+                                fontSize: '14px'
+                            }}
+                            placeholder="e.g. https://t.me/yourcommunity"
+                            value={formData.agent_telegram_link}
+                            onChange={(e) => setFormData({ ...formData, agent_telegram_link: e.target.value })}
                         />
                     </div>
 

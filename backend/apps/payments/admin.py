@@ -442,8 +442,8 @@ class PaymentSettingsAdmin(admin.ModelAdmin):
             'fields': ('bank_name', 'account_name', 'account_number'),
         }),
         ('Support & Help', {
-            'fields': ('support_url', 'support_alt_url'),
-            'description': 'Configure support links (Telegram, WhatsApp, email, helpdesk, etc.)',
+            'fields': ('support_url', 'support_alt_url', 'telegram_community_url'),
+            'description': 'Configure support links and the global Telegram Community URL.',
         }),
         ('Metadata', {
             'fields': ('updated_at', 'updated_by'),

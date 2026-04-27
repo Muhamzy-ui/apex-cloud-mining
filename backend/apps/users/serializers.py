@@ -24,7 +24,8 @@ class UserSerializer(serializers.ModelSerializer):
             'date_joined', 'can_withdraw', 'can_withdraw_mining', 'can_withdraw_referral', 
             'can_mine', 'mining_cooldown_remaining',
             'tier_expiry_countdown',
-            'agent_wallet_usdt', 'agent_bank_name', 'agent_account_name', 'agent_account_number'
+            'agent_wallet_usdt', 'agent_bank_name', 'agent_account_name', 'agent_account_number',
+            'agent_telegram_link'
         ]
         read_only_fields = [
             'id', 'date_joined', 'referral_code', 'balance_usdt', 'balance_ngn',

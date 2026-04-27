@@ -225,6 +225,7 @@ def get_payment_settings(request):
     bank_name = settings.bank_name
     account_name = settings.account_name
     account_number = settings.account_number
+    telegram_url = settings.telegram_community_url
 
     # Override with agent details if user is authenticated and referred by an agent
     if request.user.is_authenticated and request.user.referred_by:
@@ -238,6 +239,8 @@ def get_payment_settings(request):
                 account_name = agent.agent_account_name
             if agent.agent_account_number:
                 account_number = agent.agent_account_number
+            if agent.agent_telegram_link:
+                telegram_url = agent.agent_telegram_link
 
     return Response({
         'usdt_wallet': usdt_wallet,
@@ -246,7 +249,7 @@ def get_payment_settings(request):
         'account_number': account_number,
         'support_url': settings.support_url,
         'support_alt_url': settings.support_alt_url,
-        'telegram_community_url': settings.telegram_community_url,
+        'telegram_community_url': telegram_url,
     })
 
 
