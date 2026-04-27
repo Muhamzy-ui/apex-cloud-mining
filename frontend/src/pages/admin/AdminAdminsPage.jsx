@@ -53,9 +53,9 @@ export const AdminAdminsPage = () => {
             }}>
                 <div>
                     <h1 className="font-display" style={{ fontSize: '32px', fontWeight: 700, marginBottom: '8px' }}>
-                        Network Admins
+                        Junior Admins
                     </h1>
-                    <p className="text-muted">Manage the admins under your network.</p>
+                    <p className="text-muted">Manage the Junior Admins under your network.</p>
                 </div>
                 <div style={{ width: window.innerWidth < 768 ? '100%' : '300px' }}>
                     <input
