@@ -232,13 +232,13 @@ export const adminAPI = {
   deleteAdmin: (id) => apiClient.delete(`/admin/delete-admin/${id}/`),
 
   // Super Admin only: Invitations
-  createInvite: (data) => apiClient.post('/users/admin/invites/create/', data),
-  getInvites: () => apiClient.get('/users/admin/invites/'),
+  createInvite: (data) => apiClient.post('/auth/admin/invites/create/', data),
+  getInvites: () => apiClient.get('/auth/admin/invites/'),
 
   // Referral & Commissions
-  getReferralActivity: (params) => apiClient.get('/referrals/admin/activity/', { params }),
-  referralAction: (data) => apiClient.post('/referrals/admin/action/', data),
-  getGlobalCommissions: () => apiClient.get('/referrals/global/'),
+  getReferralActivity: (params) => apiClient.get('/admin/commissions/', { params }),
+  referralAction: (data) => apiClient.post('/admin/commissions/', data),
+  getGlobalCommissions: () => apiClient.get('/admin/commissions/'),
 
   // Audit
   getAuditLogs: (params) => apiClient.get('/admin/audit-log/', { params }),
@@ -250,7 +250,7 @@ export const adminAPI = {
   updateExchangeRate: (data) => apiClient.put('/admin/exchange-rate/', data),
 
   // Application (Uses token)
-  applyForAdmin: (token) => apiClient.post('/users/admin/apply/', { invite_token: token }),
+  applyForAdmin: (token) => apiClient.post('/auth/admin/apply/', { invite_token: token }),
 };
 
 export default apiClient;
