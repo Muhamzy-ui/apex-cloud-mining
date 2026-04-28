@@ -20,7 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
             'id', 'email', 'full_name', 'phone', 'country', 'avatar',
             'tier', 'tier_expiry', 'balance_usdt', 'balance_ngn', 'referral_balance_usdt', 'total_earned',
             'last_mined_at', 'trc20_wallet', 'referral_code', 'referred_by',
-            'withdrawal_fee_paid', 'is_admin', 'is_verified', 'is_agent',
+            'withdrawal_fee_paid', 'is_admin', 'is_superuser', 'is_verified', 'is_agent',
             'date_joined', 'can_withdraw', 'can_withdraw_mining', 'can_withdraw_referral', 
             'can_mine', 'mining_cooldown_remaining',
             'tier_expiry_countdown',
