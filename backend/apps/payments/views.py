@@ -162,6 +162,47 @@ def withdraw_referral(request):
     }, status=status.HTTP_201_CREATED)
 
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def transfer_referral_to_main(request):
+    """Transfer referral balance to main account (instant, no fees, no approval needed)"""
+    user = request.user
+    amount_usdt = Decimal(str(request.data.get('amount_usdt', 0)))
+    
+    # Validation
+    if amount_usdt < Decimal('10.00'):
+        return Response(
+            {'detail': 'Minimum transfer is $10 USDT'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    if amount_usdt > user.referral_balance_usdt:
+        return Response(
+            {'detail': f'Insufficient referral balance. Available: ${float(user.referral_balance_usdt):.2f} USDT'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    # Perform the transfer
+    try:
+        user.referral_balance_usdt -= amount_usdt
+        user.balance_usdt += amount_usdt
+        user.save()
+        
+        return Response({
+            'message': 'Transfer successful! Amount added to your main account.',
+            'amount_transferred': float(amount_usdt),
+            'referral_balance_remaining': float(user.referral_balance_usdt),
+            'main_balance': float(user.balance_usdt),
+        }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        print(f'❌ Transfer referral error: {str(e)}')
+        return Response(
+            {'detail': 'Transfer failed. Please try again.'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_withdrawal_status(request, transaction_id):
