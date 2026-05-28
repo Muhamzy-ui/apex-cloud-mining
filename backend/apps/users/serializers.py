@@ -25,7 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
             'can_mine', 'mining_cooldown_remaining',
             'tier_expiry_countdown',
             'agent_wallet_usdt', 'agent_bank_name', 'agent_account_name', 'agent_account_number',
-            'agent_telegram_link'
+            'agent_telegram_link', 'joined_telegram'
         ]
         read_only_fields = [
             'id', 'date_joined', 'referral_code', 'balance_usdt', 'balance_ngn',
@@ -49,7 +49,7 @@ class DashboardSerializer(serializers.ModelSerializer):
             'balance_usdt', 'balance_ngn', 'referral_balance_usdt', 'total_earned',
             'trc20_wallet', 'last_mined_at', 'withdrawal_fee_paid',
             'referral_code', 'can_withdraw', 'can_withdraw_mining', 'can_withdraw_referral',
-            'can_mine', 'mining_cooldown_remaining', 'tier_expiry_countdown'
+            'can_mine', 'mining_cooldown_remaining', 'tier_expiry_countdown', 'joined_telegram'
         ]
 
 

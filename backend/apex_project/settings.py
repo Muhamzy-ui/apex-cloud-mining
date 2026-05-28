@@ -81,20 +81,29 @@ TEMPLATES = [
 WSGI_APPLICATION = 'apex_project.wsgi.application'
 
 # Database configuration
-db_url = env('DATABASE_URL', default='postgres://postgres:Apex123@localhost:5432/apex_db')
-if db_url.startswith('postgres://'):
-    db_url = db_url.replace('postgres://', 'postgresql://', 1)
+db_url = env('DATABASE_URL', default='')
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=db_url,
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
-}
+# Use SQLite for local development if no DATABASE_URL is set, or if it is an internal Render URL
+if not db_url or (DEBUG and '-a.' in db_url):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+else:
+    if db_url.startswith('postgres://'):
+        db_url = db_url.replace('postgres://', 'postgresql://', 1)
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=db_url,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
 
 # Database SSL and health checks
-if not DEBUG:
+if not DEBUG and DATABASES['default']['ENGINE'] != 'django.db.backends.sqlite3':
     DATABASES['default']['OPTIONS'] = {
         'sslmode': 'require',
     }

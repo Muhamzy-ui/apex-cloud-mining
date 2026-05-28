@@ -328,7 +328,7 @@ export const ReferralPage = () => {
             transition: 'all 0.2s',
           }}
         >
-          {parseFloat(data?.referral_balance || 0) >= 10 ? '💸 Withdraw Referral Earnings' : `Min. Withdraw: $10.00`}
+          {parseFloat(data?.referral_balance || 0) >= 10 ? '💸 Transfer Earnings to Main Account' : `Min. Transfer: $10.00`}
         </button>
 
         {/* How it works */}

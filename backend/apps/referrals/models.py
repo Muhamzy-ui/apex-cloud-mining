@@ -25,7 +25,8 @@ class ReferralCommission(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='commissions_generated'
     )
     deposit        = models.ForeignKey(
-        'payments.Deposit', on_delete=models.CASCADE, related_name='commissions'
+        'payments.Deposit', on_delete=models.CASCADE, related_name='commissions',
+        null=True, blank=True
     )
 
     tier           = models.PositiveIntegerField(null=True, blank=True, verbose_name='Mining Tier')

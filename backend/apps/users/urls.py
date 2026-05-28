@@ -20,6 +20,7 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('bind-wallet/', views.bind_wallet, name='bind-wallet'),
     path('change-password/', views.change_password, name='change-password'),
+    path('mark-telegram-joined/', views.mark_telegram_joined, name='mark-telegram-joined'),
     
     # Notifications
     path('notifications/', views.get_notifications, name='get-notifications'),

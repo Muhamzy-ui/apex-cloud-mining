@@ -10,6 +10,7 @@ import useThemeStore from './context/themeStore';
 
 // Auth pages
 import { LoginPage, RegisterPage, ForgotPasswordPage } from './pages/auth';
+import { TelegramGatePage } from './pages/auth/TelegramGatePage';
 
 // App pages
 import { DashboardPage } from './pages/dashboard';
@@ -42,11 +43,16 @@ import './styles/global.css';
 
 // Protected Route
 const Protected = ({ children }) => {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
   const token = localStorage.getItem('access_token');
 
   if (!token && !isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  // Telegram Gate check
+  if (user && !user.joined_telegram && window.location.pathname !== '/join-telegram') {
+    return <Navigate to="/join-telegram" replace />;
   }
 
   return <AdminRedirect>{children}</AdminRedirect>;
@@ -136,6 +142,14 @@ export default function App() {
         />
 
         {/* Protected Routes */}
+        <Route
+          path="/join-telegram"
+          element={
+            <Protected>
+              <TelegramGatePage />
+            </Protected>
+          }
+        />
         <Route
           path="/dashboard"
           element={

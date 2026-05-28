@@ -98,6 +98,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
+    joined_telegram = models.BooleanField(default=False, verbose_name='Joined Telegram Community')
     date_joined = models.DateTimeField(default=timezone.now)
 
     objects = UserManager()

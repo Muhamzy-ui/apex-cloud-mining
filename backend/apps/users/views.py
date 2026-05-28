@@ -118,6 +118,36 @@ def verify_email(request):
         verification.is_used = True
         verification.save(update_fields=['is_used'])
         
+        # Credit Referral Bonus to Referrer
+        if user.referred_by:
+            from apps.referrals.models import ReferralCommission
+            from decimal import Decimal
+            bonus_amount = Decimal('1.00')
+            
+            # Create commission record
+            ReferralCommission.objects.create(
+                referrer=user.referred_by,
+                referee=user,
+                deposit=None,
+                tier=None,
+                commission_pct=Decimal('0.00'),
+                amount_usdt=bonus_amount,
+                status='credited'
+            )
+            
+            # Credit to referrer's referral balance
+            user.referred_by.referral_balance_usdt += bonus_amount
+            user.referred_by.save(update_fields=['referral_balance_usdt'])
+            
+            # Notify referrer
+            Notification.objects.create(
+                user=user.referred_by,
+                type='referral',
+                title='🎉 Referral Signup Bonus!',
+                message=f'You earned {bonus_amount} USDT because {user.email} signed up using your link.',
+                icon='🎁'
+            )
+        
         # Return login tokens
         refresh = RefreshToken.for_user(user)
         return Response({
@@ -248,6 +278,17 @@ def dashboard(request):
     """Get dashboard data"""
     serializer = DashboardSerializer(request.user)
     return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def mark_telegram_joined(request):
+    """Mark user as having joined the Telegram community"""
+    user = request.user
+    if not user.joined_telegram:
+        user.joined_telegram = True
+        user.save(update_fields=['joined_telegram'])
+    return Response({'detail': 'Telegram community joined successfully'})
 
 
 @api_view(['POST'])
