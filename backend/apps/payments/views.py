@@ -481,10 +481,10 @@ def get_nigerian_banks(request):
         {'name': 'Unity Bank', 'code': '215'},
         {'name': 'Wema Bank', 'code': '035'},
         {'name': 'Zenith Bank', 'code': '057'},
-        {'name': 'Opay', 'code': '090399'},         # Paycom (OPay)
-        {'name': 'PalmPay', 'code': '100033'},      # PalmPay
-        {'name': 'Kuda Bank', 'code': '090267'},    # Kuda Microfinance Bank
-        {'name': 'Moniepoint', 'code': '090405'},   # Moniepoint MFB
+        {'name': 'Opay', 'code': '999992'},         # Paycom (OPay) - Paystack API Code
+        {'name': 'PalmPay', 'code': '999991'},      # PalmPay - Paystack API Code
+        {'name': 'Kuda Bank', 'code': '50211'},     # Kuda Microfinance Bank - Paystack API Code
+        {'name': 'Moniepoint', 'code': '50515'},    # Moniepoint MFB - Paystack API Code
     ]
     
     return Response(banks)
