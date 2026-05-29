@@ -441,9 +441,16 @@ class PaymentSettingsAdmin(admin.ModelAdmin):
         ('Bank Payment (NGN)', {
             'fields': ('bank_name', 'account_name', 'account_number'),
         }),
-        ('Support & Help', {
-            'fields': ('support_url', 'support_alt_url', 'telegram_community_url'),
-            'description': 'Configure support links and the global Telegram Community URL.',
+        ('Telegram Channels', {
+            'fields': ('telegram_community_url', 'telegram_gate_url'),
+            'description': 'Community URL = shown on Community page. Gate URL = shown on the Join Telegram page after registration.',
+        }),
+        ('Referral Settings', {
+            'fields': ('referral_bonus_usdt',),
+            'description': 'USDT credited to the referrer when a new user signs up via their link.',
+        }),
+        ('Support Links', {
+            'fields': ('support_url', 'support_alt_url'),
         }),
         ('Metadata', {
             'fields': ('updated_at', 'updated_by'),
