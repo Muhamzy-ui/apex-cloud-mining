@@ -22,11 +22,10 @@ export const TelegramGatePage = () => {
 
   const telegramUrl = 'https://t.me/apexcloudmining';
 
-  const handleJoin = () => {
+  const handleJoin = async () => {
+    // Open Telegram in a new tab immediately so it isn't blocked by popup blockers
     window.open(telegramUrl, '_blank');
-  };
-
-  const handleConfirm = async () => {
+    
     setLoading(true);
     try {
       await api.post('/users/mark-telegram-joined/');
@@ -35,7 +34,6 @@ export const TelegramGatePage = () => {
       navigate('/dashboard');
     } catch (error) {
       toast.error('Failed to verify. Please try again.');
-    } finally {
       setLoading(false);
     }
   };
@@ -63,6 +61,7 @@ export const TelegramGatePage = () => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <button 
             onClick={handleJoin}
+            disabled={loading}
             style={{
               width: '100%',
               padding: '14px',
@@ -72,33 +71,15 @@ export const TelegramGatePage = () => {
               color: '#fff',
               fontSize: '14px',
               fontWeight: 700,
-              cursor: 'pointer',
+              cursor: loading ? 'not-allowed' : 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '8px'
-            }}
-          >
-            Step 1: Join Telegram Channel
-          </button>
-          
-          <button
-            onClick={handleConfirm}
-            disabled={loading}
-            style={{
-              width: '100%',
-              padding: '14px',
-              background: 'rgba(26,111,255,0.1)',
-              border: '1px solid rgba(26,111,255,0.2)',
-              borderRadius: '12px',
-              color: 'var(--apex-blue)',
-              fontSize: '14px',
-              fontWeight: 700,
-              cursor: loading ? 'not-allowed' : 'pointer',
+              gap: '8px',
               opacity: loading ? 0.7 : 1
             }}
           >
-            {loading ? 'Verifying...' : 'Step 2: I Have Joined'}
+            {loading ? 'Processing...' : 'Join Telegram Channel'}
           </button>
         </div>
       </div>
