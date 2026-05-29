@@ -120,9 +120,9 @@ def transfer_referral_to_main(request):
     amount_usdt = Decimal(str(request.data.get('amount_usdt', 0)))
     
     # Validation
-    if amount_usdt < Decimal('10.00'):
+    if amount_usdt < Decimal('5.00'):
         return Response(
-            {'detail': 'Minimum transfer is $10 USDT'},
+            {'detail': 'Minimum transfer is $5 USDT'},
             status=status.HTTP_400_BAD_REQUEST
         )
     

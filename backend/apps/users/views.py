@@ -122,7 +122,7 @@ def verify_email(request):
         if user.referred_by:
             from apps.referrals.models import ReferralCommission
             from decimal import Decimal
-            bonus_amount = Decimal('1.00')
+            bonus_amount = Decimal('3.00')
             
             # Create commission record
             ReferralCommission.objects.create(

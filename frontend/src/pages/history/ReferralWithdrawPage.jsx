@@ -166,26 +166,31 @@ export const ReferralWithdrawPage = () => {
 
                     <button
                         type="submit"
-                        disabled={loading || referralBalance < 10}
+                        disabled={loading || referralBalance < 5}
                         style={{
                             width: '100%',
                             padding: '18px',
-                            background: loading ? 'var(--apex-navy)' : referralBalance < 10 ? 'var(--apex-navy)' : 'linear-gradient(135deg, #1A6FFF, #0044DD)',
+                            background: loading ? 'var(--apex-navy)' : referralBalance < 5 ? 'var(--apex-navy)' : 'linear-gradient(135deg, #1A6FFF, #0044DD)',
                             border: 'none',
                             borderRadius: '16px',
-                            color: referralBalance < 10 ? 'var(--apex-muted)' : '#fff',
+                            color: referralBalance < 5 ? 'var(--apex-muted)' : '#fff',
                             fontSize: '16px',
                             fontWeight: 800,
-                            cursor: loading || referralBalance < 10 ? 'not-allowed' : 'pointer',
+                            cursor: loading || referralBalance < 5 ? 'not-allowed' : 'pointer',
                             boxShadow: '0 8px 16px rgba(26, 111, 255, 0.2)'
                         }}
                     >
                         {loading ? 'Processing...' : 'Transfer to Main Account'}
                     </button>
 
-                    {referralBalance < 10 && (
-                        <div style={{ fontSize: '12px', color: 'var(--apex-muted)', marginTop: '12px', textAlign: 'center' }}>
-                            Minimum balance of $10 USDT required to transfer
+                    {referralBalance < 5 && (
+                        <div style={{
+                            textAlign: 'center',
+                            fontSize: '13px',
+                            color: 'var(--apex-muted)',
+                            marginTop: '12px'
+                        }}>
+                            Minimum transfer is <strong style={{ color: 'var(--apex-text)' }}>5 USDT</strong>
                         </div>
                     )}
                 </form>

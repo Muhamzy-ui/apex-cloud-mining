@@ -533,73 +533,7 @@ export const WithdrawPage = () => {
         </div>
       )}
 
-      {/* NEW: Withdrawal Fee Requirement Message */}
-      {!effectiveFeePaid && !showBalanceLockMessage && (
-        <div style={{
-          background: 'linear-gradient(135deg, rgba(245,166,35,0.12), rgba(245,166,35,0.08))',
-          border: '1px solid rgba(245,166,35,0.4)',
-          borderRadius: '20px',
-          padding: '24px',
-          marginBottom: '20px',
-        }}>
-          <div style={{
-            width: '56px',
-            height: '56px',
-            background: 'rgba(245,166,35,0.2)',
-            borderRadius: '16px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginBottom: '16px',
-          }}>
-            <span style={{ fontSize: '28px' }}>💳</span>
-          </div>
 
-          <h3 style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '20px',
-            fontWeight: 800,
-            color: 'var(--apex-gold)',
-            marginBottom: '12px',
-          }}>
-            One-Time Transfer Fee Required
-          </h3>
-
-          <p style={{
-            fontSize: '14px',
-            color: 'var(--apex-muted)',
-            marginBottom: '20px',
-            lineHeight: 1.7,
-          }}>
-            {isTier1 
-              ? "Great job mining! Now that you've reached 100 USDT, you must pay a one-time transfer fee to unlock your withdrawals."
-              : "To enable withdrawals on your current plan, a one-time transfer fee is required."}
-          </p>
-
-          <button
-            onClick={() => navigate('/withdraw-fee')}
-            style={{
-              width: '100%',
-              padding: '16px',
-              background: 'linear-gradient(135deg, var(--apex-gold), #CC8800)',
-              border: 'none',
-              borderRadius: '14px',
-              color: '#000',
-              fontFamily: 'var(--font-display)',
-              fontSize: '15px',
-              fontWeight: 800,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '10px',
-              boxShadow: '0 8px 24px rgba(245, 166, 35, 0.3)',
-            }}
-          >
-            💳 Pay Transfer Fee Now
-          </button>
-        </div>
-      )}
 
 
 
@@ -679,8 +613,6 @@ export const WithdrawPage = () => {
       )}
 
       <div style={{
-        opacity: isFullyUnlocked ? 1 : 0.4,
-        pointerEvents: isFullyUnlocked ? 'auto' : 'none',
         overflow: 'hidden', // Prevent horizontal bleed on mobile
       }}>
         <div style={{
