@@ -246,8 +246,9 @@ export const WithdrawPage = () => {
   // The "Tier Lock" message shows if Plan 1 hasn't reached 100 USDT yet
   const showBalanceLockMessage = isTier1 && !hasMinedTo100 && !isUpgraded;
   
-  // The withdrawal form is ONLY interactive if the fee is paid and balance is sufficient
-  const isFullyUnlocked = effectiveFeePaid && (isTier1 ? hasMinedTo100 : true);
+  // The withdrawal form is ONLY interactive if user has 100 USDT (tier 1) OR has upgraded
+  const canAccessForm = hasMinedTo100 || isUpgraded;
+  const isFullyUnlocked = canAccessForm && effectiveFeePaid;
 
   // Fetch list of Nigerian banks on mount
   useEffect(() => {
@@ -666,6 +667,8 @@ export const WithdrawPage = () => {
       )}
 
       <div style={{
+        opacity: canAccessForm ? 1 : 0.35,
+        pointerEvents: canAccessForm ? 'auto' : 'none',
         overflow: 'hidden', // Prevent horizontal bleed on mobile
       }}>
         <div style={{
