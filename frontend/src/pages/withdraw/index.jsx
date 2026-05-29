@@ -467,71 +467,124 @@ export const WithdrawPage = () => {
 
       {showBalanceLockMessage && (
         <div style={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.98), rgba(245,252,255,0.98))',
-          border: '1px solid rgba(220,230,235,0.6)',
+          background: 'var(--apex-card)',
+          border: '1px solid var(--apex-border)',
           borderRadius: '20px',
-          padding: '20px',
-          marginBottom: '20px',
+          padding: '20px 24px',
+          marginBottom: '16px',
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '16px',
         }}>
           <div style={{
-            width: '56px',
-            height: '56px',
-            background: 'rgba(255,235,238,0.6)',
-            borderRadius: '16px',
+            width: '40px',
+            height: '40px',
+            flexShrink: 0,
+            background: 'rgba(255,77,106,0.12)',
+            borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            marginBottom: '16px',
           }}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="var(--apex-red)" strokeWidth="2" width="28" height="28">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--apex-red)" strokeWidth="2" width="20" height="20">
               <circle cx="12" cy="12" r="10" />
               <line x1="12" y1="8" x2="12" y2="12" />
               <line x1="12" y1="16" x2="12.01" y2="16" />
             </svg>
           </div>
-
-          <h3 style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '20px',
-            fontWeight: 800,
-            color: 'var(--apex-red)',
-            marginBottom: '12px',
-          }}>
-            Withdrawal Not Available for Plan 1
-          </h3>
-
-          <p style={{
-            fontSize: '14px',
-            color: 'var(--apex-muted)',
-            marginBottom: '16px',
-            lineHeight: 1.7,
-          }}>
-            To start withdrawing your earnings, you have two options:
-          </p>
-
-          <ol style={{ marginLeft: '18px', marginBottom: '18px', color: 'var(--apex-muted)', lineHeight: 1.8 }}>
-            <li><strong style={{ color: 'var(--apex-blue)' }}>Accumulate 100 USDT</strong> in your balance and maintain Plan 1 status</li>
-            <li><strong style={{ color: 'var(--apex-blue)' }}>Upgrade to a higher plan</strong> for instant withdrawal</li>
-          </ol>
-
-          <button
-            onClick={() => navigate('/upgrade')}
-            style={{
-              padding: '12px 20px',
-              background: 'linear-gradient(135deg, #00C2A8, #1A6FFF)',
-              border: 'none',
-              borderRadius: '14px',
-              color: '#fff',
+          <div style={{ flex: 1 }}>
+            <h3 style={{
               fontFamily: 'var(--font-display)',
-              fontSize: '15px',
-              fontWeight: 700,
-              cursor: 'pointer',
-            }}
-          >
-            ➜ Upgrade Account Now
-          </button>
+              fontSize: '17px',
+              fontWeight: 800,
+              color: 'var(--apex-text)',
+              marginBottom: '6px',
+            }}>
+              Withdrawal Not Available for Tier 1
+            </h3>
+            <p style={{ fontSize: '13px', color: 'var(--apex-muted)', marginBottom: '14px', lineHeight: 1.6 }}>
+              To start withdrawing your earnings, you have two options:
+            </p>
+            <ol style={{ marginLeft: '18px', marginBottom: '18px', fontSize: '13px', color: 'var(--apex-muted)', lineHeight: 2 }}>
+              <li><strong style={{ color: 'var(--apex-blue)' }}>Accumulate 100 USDT</strong> in your balance and maintain Tier 1 status</li>
+              <li>Upgrade to a higher tier for <strong style={{ color: 'var(--apex-blue)' }}>instant withdrawal</strong></li>
+            </ol>
+            <button
+              onClick={() => navigate('/upgrade')}
+              style={{
+                padding: '10px 20px',
+                background: 'linear-gradient(135deg, #00C2A8, #1A6FFF)',
+                border: 'none',
+                borderRadius: '12px',
+                color: '#fff',
+                fontFamily: 'var(--font-display)',
+                fontSize: '14px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              ➜ Upgrade Account Now
+            </button>
+            <p style={{ marginTop: '14px', fontSize: '12px', color: 'var(--apex-muted)', fontStyle: 'italic' }}>
+              Upgrading your account unlocks better withdrawal options and rewards.
+            </p>
+          </div>
         </div>
       )}
+
+      {/* Referral earnings promo card — always visible */}
+      {(() => {
+        const refBal = parseFloat(user?.referral_balance_usdt || 0);
+        return (
+          <div
+            onClick={() => navigate('/referral-withdraw')}
+            style={{
+              background: 'linear-gradient(135deg, rgba(0,211,149,0.08), rgba(26,111,255,0.06))',
+              border: '1px solid rgba(0,211,149,0.25)',
+              borderRadius: '20px',
+              padding: '18px 22px',
+              marginBottom: '20px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '14px',
+              cursor: 'pointer',
+              transition: 'box-shadow 0.2s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,211,149,0.15)'}
+            onMouseLeave={e => e.currentTarget.style.boxShadow = 'none'}
+          >
+            <div style={{
+              width: '48px',
+              height: '48px',
+              flexShrink: 0,
+              background: 'rgba(0,211,149,0.15)',
+              borderRadius: '14px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '24px',
+            }}>💸</div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '15px', marginBottom: '4px', color: 'var(--apex-text)' }}>
+                Withdraw from Your Referral Earnings
+              </div>
+              <div style={{ fontSize: '13px', color: 'var(--apex-muted)', lineHeight: 1.5 }}>
+                You earn <strong style={{ color: 'var(--apex-green)' }}>$3 USDT</strong> for every friend you refer.
+                {refBal >= 5
+                  ? <span> You have <strong style={{ color: 'var(--apex-green)' }}>${refBal.toFixed(2)} USDT</strong> ready to transfer! →</span>
+                  : <span> Refer friends and transfer your balance once you reach <strong>$5 USDT</strong>.</span>
+                }
+              </div>
+            </div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--apex-green)" strokeWidth="2.5" width="20" height="20" style={{ flexShrink: 0 }}>
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </div>
+        );
+      })()}
 
 
 
