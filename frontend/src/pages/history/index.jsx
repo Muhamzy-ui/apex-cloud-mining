@@ -334,17 +334,37 @@ export const ReferralPage = () => {
         {/* How it works */}
         <Card style={{ marginBottom: '16px' }}>
           <SectionTitle>How Referrals Work</SectionTitle>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             {[
-              'Share your unique referral link with friends and family',
-              'They register using your link and upgrade their account',
-              'You instantly receive the USDT commission reward for that plan',
+              {
+                icon: '🔗',
+                title: 'Share Your Referral Link',
+                desc: 'Copy your unique referral link from above and share it with friends, family, or on social media.',
+              },
+              {
+                icon: '👤',
+                title: 'Friend Registers & Activates a Plan',
+                desc: 'When your friend signs up using your link and purchases any mining plan, you automatically earn a fixed USDT commission reward — no waiting, no minimums.',
+              },
+              {
+                icon: '💰',
+                title: 'Earn Fixed USDT Rewards Per Plan',
+                desc: 'Each mining tier has a specific referral reward amount (set by admin). The higher the plan your friend buys, the more you earn. Your commission is instantly credited to your referral balance.',
+              },
+              {
+                icon: '🏦',
+                title: 'Transfer to Main Balance (Min. $10)',
+                desc: 'Once your referral balance reaches $10.00, click the "Transfer Earnings" button to move your funds to your main account balance for withdrawal.',
+              },
             ].map((step, i) => (
-              <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                <div style={{ minWidth: '32px', height: '32px', background: 'rgba(26,111,255,0.15)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 700, color: 'var(--apex-blue)' }}>
-                  {i + 1}
+              <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', padding: '12px', background: 'rgba(26,111,255,0.04)', borderRadius: '12px', border: '1px solid rgba(26,111,255,0.08)' }}>
+                <div style={{ minWidth: '36px', height: '36px', background: 'rgba(26,111,255,0.12)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', flexShrink: 0 }}>
+                  {step.icon}
                 </div>
-                <p style={{ fontSize: '13px', color: 'var(--apex-muted)', lineHeight: 1.6 }}>{step}</p>
+                <div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--apex-text)', marginBottom: '4px' }}>{step.title}</div>
+                  <p style={{ fontSize: '12px', color: 'var(--apex-muted)', lineHeight: 1.7, margin: 0 }}>{step.desc}</p>
+                </div>
               </div>
             ))}
           </div>
