@@ -234,7 +234,7 @@ export const ProfilePage = () => {
   const [showNotif, setShowNotif] = useState(false);
   const fileInputRef = useRef(null);
 
-  const BASE_URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api/v1', '') : 'http://localhost:8000';
+  const BASE_URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api/v1', '') : 'https://apex-cloud-mining-1.onrender.com';
   const avatarUrl = user?.avatar
     ? `${BASE_URL}${user.avatar}`
     : null;

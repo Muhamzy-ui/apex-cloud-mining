@@ -8,7 +8,7 @@ import useAuthStore from '../../context/authStore';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+const API_URL = import.meta.env.VITE_API_URL || 'https://apex-cloud-mining-1.onrender.com/api/v1';
 
 export const WithdrawFeePage = () => {
   const navigate = useNavigate();

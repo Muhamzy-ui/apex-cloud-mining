@@ -9,7 +9,7 @@ import useNotificationStore from '../../context/notificationStore';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+const API_URL = import.meta.env.VITE_API_URL || 'https://apex-cloud-mining-1.onrender.com/api/v1';
 
 const PLANS = [
   { n: 1, name: 'Plan 1', price_usd: 0, price_ngn: 0, earn: 1.00, duration: '100 Days', isFree: true },

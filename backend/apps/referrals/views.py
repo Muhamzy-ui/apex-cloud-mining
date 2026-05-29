@@ -51,12 +51,7 @@ class ReferralDashboardView(APIView):
             total_earned = float(commissions.aggregate(total=Sum('amount_usdt'))['total'] or 0)
 
         from django.conf import settings
-        frontend_url = "https://apex-mining-frontend.vercel.app"
-        try:
-            if hasattr(settings, 'CORS_ALLOWED_ORIGINS') and settings.CORS_ALLOWED_ORIGINS:
-                frontend_url = settings.CORS_ALLOWED_ORIGINS[0]
-        except Exception:
-            pass
+        frontend_url = getattr(settings, 'FRONTEND_URL', 'https://apxcloudmine.com')
             
         return Response({
             'referral_code':    user.referral_code,

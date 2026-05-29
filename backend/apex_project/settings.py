@@ -138,10 +138,15 @@ SIMPLE_JWT = {
 CORS_ALLOW_ALL_ORIGINS = env.bool('CORS_ALLOW_ALL_ORIGINS', default=True)
 
 CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=[
+    'https://apxcloudmine.com',
+    'https://www.apxcloudmine.com',
     'http://localhost:3000',
     'http://localhost:5173',
 ])
 CORS_ALLOW_CREDENTIALS = True
+
+# Production frontend URL (used for referral links, emails, etc.)
+FRONTEND_URL = env('FRONTEND_URL', default='https://apxcloudmine.com')
 
 # Static & Media
 STATIC_URL = '/static/'

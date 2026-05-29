@@ -3,8 +3,8 @@
  */
 import axios from 'axios';
 
-// Get API URL from environment variable, fallback to localhost for development
-const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api/v1';
+// Get API URL from environment variable, fallback to production
+const API_URL = import.meta.env.VITE_API_URL || 'https://apex-cloud-mining-1.onrender.com/api/v1';
 
 // Create axios instance
 const apiClient = axios.create({
