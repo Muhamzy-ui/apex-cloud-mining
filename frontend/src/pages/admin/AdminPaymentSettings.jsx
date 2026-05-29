@@ -43,6 +43,18 @@ export const AdminPaymentSettings = () => {
         agent_telegram_link: '',
     });
 
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    const [isSmallMobile, setIsSmallMobile] = useState(window.innerWidth < 640);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768);
+            setIsSmallMobile(window.innerWidth < 640);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     // System-level settings (super admin only)
     const [sysForm, setSysForm] = useState({
         telegram_community_url: '',
@@ -116,7 +128,7 @@ export const AdminPaymentSettings = () => {
     const cardStyle = {
         background: 'var(--apex-card)',
         borderRadius: '20px',
-        padding: window.innerWidth < 768 ? '20px' : '28px',
+        padding: isMobile ? '20px' : '28px',
         border: '1px solid var(--apex-border)',
         marginBottom: '28px',
     };
@@ -131,8 +143,8 @@ export const AdminPaymentSettings = () => {
 
     return (
         <div className="page-content" style={{ maxWidth: '800px', margin: '0 auto' }}>
-            <header style={{ marginBottom: '32px', paddingTop: window.innerWidth < 768 ? '0px' : '40px' }}>
-                <h1 className="font-display" style={{ fontSize: window.innerWidth < 768 ? '24px' : '32px', fontWeight: 700, marginBottom: '8px' }}>
+            <header style={{ marginBottom: '32px', paddingTop: isMobile ? '0px' : '40px' }}>
+                <h1 className="font-display" style={{ fontSize: isMobile ? '24px' : '32px', fontWeight: 700, marginBottom: '8px' }}>
                     Settings
                 </h1>
                 <p className="text-muted">Manage Telegram links, referral bonus, payment info and more.</p>
@@ -206,7 +218,7 @@ export const AdminPaymentSettings = () => {
                                     <label style={labelStyle}>USDT Wallet Address (TRC20)</label>
                                     <input type="text" style={{ ...inputStyle, fontFamily: 'monospace' }} placeholder="TRC20 wallet address" value={sysForm.usdt_wallet} onChange={e => setSysForm(p => ({ ...p, usdt_wallet: e.target.value }))} />
                                 </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 640 ? '1fr' : '1fr 1fr', gap: '14px' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: isSmallMobile ? '1fr' : '1fr 1fr', gap: '14px' }}>
                                     <div>
                                         <label style={labelStyle}>Bank Name</label>
                                         <input type="text" style={inputStyle} placeholder="e.g. Opay" value={sysForm.bank_name} onChange={e => setSysForm(p => ({ ...p, bank_name: e.target.value }))} />
@@ -260,7 +272,7 @@ export const AdminPaymentSettings = () => {
                         <label style={labelStyle}>Agent USDT Wallet (TRC20)</label>
                         <input type="text" style={{ ...inputStyle, fontFamily: 'monospace' }} placeholder="Your TRC20 wallet address" value={agentForm.agent_wallet_usdt} onChange={e => setAgentForm(p => ({ ...p, agent_wallet_usdt: e.target.value }))} />
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 640 ? '1fr' : '1fr 1fr', gap: '16px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: isSmallMobile ? '1fr' : '1fr 1fr', gap: '16px' }}>
                         <div>
                             <label style={labelStyle}>Bank Name</label>
                             <input type="text" style={inputStyle} placeholder="e.g. Zenith Bank" value={agentForm.agent_bank_name} onChange={e => setAgentForm(p => ({ ...p, agent_bank_name: e.target.value }))} />
