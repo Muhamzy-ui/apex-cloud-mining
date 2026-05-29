@@ -16,7 +16,7 @@ const cardStyle = {
 };
 
 export const TelegramGatePage = () => {
-  const { user, checkAuth } = useAuthStore();
+  const { user, refreshUser } = useAuthStore();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
@@ -29,7 +29,7 @@ export const TelegramGatePage = () => {
     setLoading(true);
     try {
       await api.post('/auth/mark-telegram-joined/');
-      await checkAuth(); 
+      await refreshUser(); 
       toast.success('Thank you for joining our community!');
       navigate('/dashboard');
     } catch (error) {
