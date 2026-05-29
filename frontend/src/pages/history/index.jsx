@@ -343,8 +343,8 @@ export const ReferralPage = () => {
               },
               {
                 icon: '👤',
-                title: 'Friend Registers & Activates a Plan',
-                desc: 'When your friend signs up using your link and purchases any mining plan, you automatically earn a fixed USDT commission reward — no waiting, no minimums.',
+                title: 'Register Your Friend',
+                desc: 'Register your friend and get $3 per referral.',
               },
               {
                 icon: '💰',

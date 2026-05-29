@@ -367,6 +367,10 @@ def verify_account_number(request):
         account_number = str(account_number)
     account_number = account_number.strip()
     
+    # Standardize 11-digit phone-based bank accounts (like OPay/PalmPay) to 10-digit NUBAN format
+    if len(account_number) == 11 and account_number.startswith('0'):
+        account_number = account_number[1:]
+    
     if not account_number.isdigit() or len(account_number) != 10:
         logger.warning(
             f"Failed account lookup verification: Invalid account number format '{account_number}' requested by User ID: {request.user.id}"
@@ -378,6 +382,7 @@ def verify_account_number(request):
     
     # Check if Paystack API is configured
     paystack_key = getattr(settings, 'PAYSTACK_SECRET_KEY', None)
+    is_test_mode = paystack_key and paystack_key.startswith('sk_test_')
     
     if paystack_key and paystack_key != 'YOUR_PAYSTACK_SECRET_KEY':
         # Use real Paystack API
@@ -407,6 +412,41 @@ def verify_account_number(request):
                         'account_number': account_number,
                     })
             
+            # If in Paystack Test Mode and lookup fails (e.g. daily lookup limit exceeded),
+            # fall back to returning a realistic mock name so verification works during testing.
+            if is_test_mode:
+                logger.warning(
+                    f"Paystack resolve failed in test mode (Status {response.status_code}). Falling back to mock name resolution."
+                )
+                mock_names = {
+                    '0000000001': 'Chioma Okoro',
+                    '0000000002': 'Tunde Adeyemi',
+                    '0000000003': 'Zainab Hussein',
+                    '0000000004': 'Ngozi Ezeoke',
+                    '0000000005': 'David Okafor',
+                    '0072410373': 'MAHMUD OLASUNKANMI BASHIR',
+                    '8072410373': 'MAHMUD OLASUNKANMI BASHIR',
+                    '08072410373': 'MAHMUD OLASUNKANMI BASHIR',
+                    '1234567890': 'Grace Nwosu',
+                    '9876543210': 'Emeka Chukwu',
+                }
+                
+                if account_number in mock_names:
+                    account_name = mock_names[account_number]
+                else:
+                    hash_val = abs(hash(account_number)) % 1000
+                    first_names = ['Chioma', 'Tunde', 'Zainab', 'Ngozi', 'David', 'Grace', 'Emeka', 'Amara', 'Kayode', 'Blessing']
+                    last_names = ['Okoro', 'Adeyemi', 'Hussein', 'Ezeoke', 'Okafor', 'Nwosu', 'Chukwu', 'Iyanda', 'Mwangi', 'Ogunlade']
+                    first = first_names[hash_val % len(first_names)]
+                    last = last_names[(hash_val // len(first_names)) % len(last_names)]
+                    account_name = f'{first} {last}'
+                
+                return Response({
+                    'account_name': account_name,
+                    'account_number': account_number,
+                    '_debug_mode': 'Paystack test limit exceeded. Fallback mock name returned.'
+                })
+            
             logger.warning(
                 f"Failed account lookup verification: Paystack API could not resolve '{account_number}' with bank '{bank_code}' for User ID: {request.user.id}"
             )
@@ -417,6 +457,33 @@ def verify_account_number(request):
             
         except Exception as e:
             logger.error(f'⚠️ Paystack verification error: {str(e)}')
+            if is_test_mode:
+                mock_names = {
+                    '0000000001': 'Chioma Okoro',
+                    '0000000002': 'Tunde Adeyemi',
+                    '0000000003': 'Zainab Hussein',
+                    '0000000004': 'Ngozi Ezeoke',
+                    '0000000005': 'David Okafor',
+                    '0072410373': 'MAHMUD OLASUNKANMI BASHIR',
+                    '8072410373': 'MAHMUD OLASUNKANMI BASHIR',
+                    '08072410373': 'MAHMUD OLASUNKANMI BASHIR',
+                    '1234567890': 'Grace Nwosu',
+                    '9876543210': 'Emeka Chukwu',
+                }
+                if account_number in mock_names:
+                    account_name = mock_names[account_number]
+                else:
+                    hash_val = abs(hash(account_number)) % 1000
+                    first_names = ['Chioma', 'Tunde', 'Zainab', 'Ngozi', 'David', 'Grace', 'Emeka', 'Amara', 'Kayode', 'Blessing']
+                    last_names = ['Okoro', 'Adeyemi', 'Hussein', 'Ezeoke', 'Okafor', 'Nwosu', 'Chukwu', 'Iyanda', 'Mwangi', 'Ogunlade']
+                    first = first_names[hash_val % len(first_names)]
+                    last = last_names[(hash_val // len(first_names)) % len(last_names)]
+                    account_name = f'{first} {last}'
+                return Response({
+                    'account_name': account_name,
+                    'account_number': account_number,
+                    '_debug_mode': 'Paystack connection error. Fallback mock name returned.'
+                })
             return Response(
                 {'detail': 'Account verification service unavailable. Please try again.'},
                 status=status.HTTP_533_SERVICE_UNAVAILABLE
@@ -433,7 +500,9 @@ def verify_account_number(request):
             '0000000003': 'Zainab Hussein',
             '0000000004': 'Ngozi Ezeoke',
             '0000000005': 'David Okafor',
-            '0072410373': 'John Oyedele',  # User's test account (from screenshot)
+            '0072410373': 'MAHMUD OLASUNKANMI BASHIR',
+            '8072410373': 'MAHMUD OLASUNKANMI BASHIR',
+            '08072410373': 'MAHMUD OLASUNKANMI BASHIR',
             '1234567890': 'Grace Nwosu',
             '9876543210': 'Emeka Chukwu',
         }
