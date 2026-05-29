@@ -28,7 +28,7 @@ export const TelegramGatePage = () => {
     
     setLoading(true);
     try {
-      await api.post('/users/mark-telegram-joined/');
+      await api.post('/auth/mark-telegram-joined/');
       await checkAuth(); 
       toast.success('Thank you for joining our community!');
       navigate('/dashboard');
