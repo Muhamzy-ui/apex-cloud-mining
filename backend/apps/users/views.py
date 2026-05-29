@@ -121,8 +121,9 @@ def verify_email(request):
         # Credit Referral Bonus to Referrer
         if user.referred_by:
             from apps.referrals.models import ReferralCommission
+            from apps.payments.models import PaymentSettings as PS
             from decimal import Decimal
-            bonus_amount = Decimal('3.00')
+            bonus_amount = Decimal(str(PS.get_settings().referral_bonus_usdt))
             
             # Create commission record
             ReferralCommission.objects.create(

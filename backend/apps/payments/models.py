@@ -152,6 +152,20 @@ class PaymentSettings(models.Model):
         help_text='Link to the official Telegram community channel'
     )
     
+    telegram_gate_url = models.URLField(
+        max_length=500,
+        blank=True,
+        default='https://t.me/apexcloudmining',
+        help_text='Telegram link used in the Join Telegram gate page (after registration)'
+    )
+
+    referral_bonus_usdt = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        default=3.00,
+        help_text='USDT reward credited to referrer for each successful sign-up'
+    )
+
     # Metadata
     updated_at = models.DateTimeField(auto_now=True)
     updated_by = models.ForeignKey(

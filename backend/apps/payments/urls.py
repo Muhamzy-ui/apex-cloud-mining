@@ -10,6 +10,7 @@ urlpatterns = [
     path('withdrawal-limits/', views.get_withdrawal_limits),
     path('withdrawal-fees/', views.get_withdrawal_fees),
     path('settings/', views.get_payment_settings),
+    path('settings/update/', views.update_payment_settings),
     path('pay-withdrawal-fee/', views.pay_withdrawal_fee),
     path('verify-account/', views.verify_account_number),
     path('banks/', views.get_nigerian_banks),

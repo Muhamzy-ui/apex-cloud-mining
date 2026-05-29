@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthLayout, ApexLogo } from '../../components/layout';
 import { Button } from '../../components/ui';
@@ -19,8 +19,15 @@ export const TelegramGatePage = () => {
   const { user, refreshUser } = useAuthStore();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [telegramUrl, setTelegramUrl] = useState('https://t.me/apexcloudmining');
 
-  const telegramUrl = 'https://t.me/apexcloudmining';
+  // Load telegram URL from admin settings
+  useEffect(() => {
+    api.get('/payments/settings/').then(res => {
+      const url = res.data?.telegram_gate_url || res.data?.telegram_community_url;
+      if (url) setTelegramUrl(url);
+    }).catch(() => {});
+  }, []);
 
   const handleJoin = async () => {
     // Open Telegram in a new tab immediately so it isn't blocked by popup blockers

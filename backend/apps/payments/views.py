@@ -241,7 +241,34 @@ def get_payment_settings(request):
         'support_url': settings.support_url,
         'support_alt_url': settings.support_alt_url,
         'telegram_community_url': telegram_url,
+        'telegram_gate_url': settings.telegram_gate_url or settings.telegram_community_url,
+        'referral_bonus_usdt': float(settings.referral_bonus_usdt),
     })
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def update_payment_settings(request):
+    """Super admin: update global payment / community settings"""
+    user = request.user
+    if not (user.is_superuser or getattr(user, 'is_super_admin', False)):
+        return Response({'detail': 'Not authorized'}, status=status.HTTP_403_FORBIDDEN)
+
+    settings_obj = PaymentSettings.get_settings()
+
+    allowed_fields = [
+        'usdt_wallet', 'bank_name', 'account_name', 'account_number',
+        'support_url', 'support_alt_url',
+        'telegram_community_url', 'telegram_gate_url', 'referral_bonus_usdt',
+    ]
+    for field in allowed_fields:
+        if field in request.data:
+            setattr(settings_obj, field, request.data[field])
+
+    settings_obj.updated_by = user
+    settings_obj.save()
+
+    return Response({'detail': 'Settings updated successfully'})
 
 
 @api_view(['GET'])
