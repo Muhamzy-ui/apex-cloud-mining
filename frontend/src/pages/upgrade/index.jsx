@@ -60,8 +60,8 @@ const PayModal = ({ plan, paymentInfo, agentName, onClose }) => {
         },
       });
 
-      toast.success('✅ Payment submitted! Awaiting admin approval.');
-      add('⏳', 'Payment Submitted', `Your ${plan.name} upgrade payment has been submitted. Admin will review within 24 hours.`);
+      toast.success('✅ Payment submitted! Awaiting confirmation.');
+      add('⏳', 'Payment Submitted', `Your ${plan.name} upgrade payment has been submitted. It will be reviewed within 24 hours.`);
 
       onClose();
     } catch (err) {

@@ -30,7 +30,7 @@ export const PaymentModal = ({ tier, onClose }) => {
       if (proof) fd.append('proof_image', proof);
 
       await paymentsAPI.deposit(fd);
-      toast.success('Payment submitted! Awaiting admin confirmation.');
+      toast.success('Payment submitted! Awaiting confirmation.');
       onClose();
     } catch (err) {
       const msg = err.response?.data?.detail || 'Submission failed.';

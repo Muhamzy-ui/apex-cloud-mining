@@ -117,7 +117,7 @@ export const WithdrawFeePage = () => {
         },
       });
 
-      toast.success('✅ Transfer fee payment submitted! Awaiting admin approval.');
+      toast.success('✅ Transfer fee payment submitted! Awaiting confirmation.');
       setTimeout(() => navigate('/withdraw'), 2000);
     } catch (err) {
       console.error('Fee payment error:', err);

@@ -290,7 +290,7 @@ export const ReferralPage = () => {
         </div>
 
         {/* Dynamic Warning */}
-        {parseFloat(data?.referral_balance || 0) >= 5 && parseFloat(data?.referral_balance || 0) < 10 && (
+        {parseFloat(data?.referral_balance || 0) > 0 && parseFloat(data?.referral_balance || 0) < 10 && (
           <div style={{
             background: 'rgba(245, 166, 35, 0.1)',
             border: '1px solid rgba(245, 166, 35, 0.3)',

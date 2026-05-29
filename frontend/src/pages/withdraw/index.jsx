@@ -206,9 +206,6 @@ export const WithdrawPage = () => {
   const [banks, setBanks] = useState([]);
   const [bankSearch, setBankSearch] = useState('');
   const [selectedBank, setSelectedBank] = useState(null);
-  const [verifying, setVerifying] = useState(false);
-  const [verifiedName, setVerifiedName] = useState('');
-  const [verificationError, setVerificationError] = useState('');
   const [showBankDropdown, setShowBankDropdown] = useState(false);
   const [planTransferFeeUsdt, setPlanTransferFeeUsdt] = useState(0);
   const [exchangeRate, setExchangeRate] = useState(1600);
@@ -309,44 +306,7 @@ export const WithdrawPage = () => {
     fetchLimits();
   }, []);
 
-  // Auto-verify account name when account number is complete (10 digits)
-  // This mimics Opay's behavior of real-time account verification
-  useEffect(() => {
-    const verifyAccount = async () => {
-      if (selectedBank && form.account_number.length === 10) {
-        setVerifying(true);
-        setVerificationError('');
-        try {
-          const token = localStorage.getItem('access_token');
-          const response = await axios.post(
-            `${API_URL}/payments/verify-account/`,
-            {
-              account_number: form.account_number,
-              bank_code: selectedBank.code,
-            },
-            {
-              headers: { 'Authorization': `Bearer ${token}` }
-            }
-          );
-          setVerifiedName(response.data.account_name);
-          setForm(prev => ({ ...prev, account_name: response.data.account_name }));
-          setVerificationError('');
-        } catch (err) {
-          console.error('Verification failed:', err);
-          setVerifiedName('');
-          setVerificationError(err.response?.data?.detail || 'Could not verify account. Check details.');
-        } finally {
-          setVerifying(false);
-        }
-      } else {
-        setVerifiedName('');
-        setVerificationError('');
-      }
-    };
 
-    const timer = setTimeout(verifyAccount, 500);
-    return () => clearTimeout(timer);
-  }, [selectedBank, form.account_number]);
 
   const set = (k) => (e) => setForm(prev => ({ ...prev, [k]: e.target.value }));
 
@@ -578,9 +538,9 @@ export const WithdrawPage = () => {
               </div>
               <div style={{ fontSize: '13px', color: 'var(--apex-muted)', lineHeight: 1.5 }}>
                 You earn <strong style={{ color: 'var(--apex-green)' }}>$3 USDT</strong> for every friend you refer.
-                {refBal >= 5
+                {refBal >= 10
                   ? <span> You have <strong style={{ color: 'var(--apex-green)' }}>${refBal.toFixed(2)} USDT</strong> ready to transfer! →</span>
-                  : <span> Refer friends and transfer your balance once you reach <strong>$5 USDT</strong>.</span>
+                  : <span> Refer friends and transfer your balance once you reach <strong>$10 USDT</strong>.</span>
                 }
               </div>
             </div>
@@ -945,8 +905,6 @@ export const WithdrawPage = () => {
                     onClick={() => {
                       setSelectedBank(null);
                       setBankSearch('');
-                      setVerifiedName('');
-                      setVerificationError('');
                       setForm(prev => ({ ...prev, bank_name: '', account_name: '', account_number: '' }));
                     }}
                     style={{
@@ -995,7 +953,6 @@ export const WithdrawPage = () => {
                           setSelectedBank(bank);
                           setBankSearch(bank.name);
                           setForm(prev => ({ ...prev, bank_name: bank.name }));
-                          setVerificationError('');
                           setShowBankDropdown(false);
                         }}
                         style={{
@@ -1031,14 +988,14 @@ export const WithdrawPage = () => {
                 💳 Account Number
                 {!selectedBank && <span style={{ marginLeft: '6px', fontSize: '11px' }}>(Select bank first)</span>}
               </div>
-              <div style={{
+               <div style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '12px',
                 padding: '16px',
                 background: selectedBank ? 'var(--apex-navy)' : 'rgba(26, 111, 255, 0.05)',
                 borderRadius: '14px',
-                border: `1px solid ${verificationError ? '#FF4D6A' : selectedBank ? 'var(--apex-border)' : 'rgba(255, 77, 106, 0.3)'}`,
+                border: `1px solid ${selectedBank ? 'var(--apex-border)' : 'rgba(255, 77, 106, 0.3)'}`,
                 opacity: selectedBank ? 1 : 0.6,
               }}>
                 <div style={{
@@ -1064,10 +1021,6 @@ export const WithdrawPage = () => {
                     if (!selectedBank) return;
                     const value = e.target.value.replace(/\D/g, '').slice(0, 10);
                     setForm(prev => ({ ...prev, account_number: value }));
-                    if (value.length !== 10) {
-                      setVerifiedName('');
-                      setVerificationError('');
-                    }
                   }}
                   placeholder={selectedBank ? "Enter 10-digit account number" : "Select a bank first"}
                   style={{
@@ -1083,81 +1036,7 @@ export const WithdrawPage = () => {
                 />
               </div>
 
-              {verifying && (
-                <div style={{
-                  marginTop: '8px',
-                  fontSize: '12px',
-                  color: 'var(--apex-muted)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                }}>
-                  <div style={{
-                    width: '12px',
-                    height: '12px',
-                    border: '2px solid var(--apex-blue)',
-                    borderTop: '2px solid transparent',
-                    borderRadius: '50%',
-                    animation: 'spin 0.8s linear infinite',
-                  }} />
-                  Verifying account...
-                </div>
-              )}
-
-              {/* show verification success banner but allow editing */}
-              {verifiedName && (
-                <div style={{
-                  marginTop: '8px',
-                  padding: '12px',
-                  background: 'rgba(0, 211, 149, 0.1)',
-                  border: '1px solid rgba(0, 211, 149, 0.2)',
-                  borderRadius: '12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                }}>
-                  <div style={{
-                    width: '24px',
-                    height: '24px',
-                    background: 'var(--apex-green)',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                  }}>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" width="14" height="14">
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '11px', color: 'var(--apex-muted)' }}>Auto‑detected account name (you may edit)</div>
-                    <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--apex-green)' }}>
-                      {verifiedName}
-                    </div>
-                  </div>
-                </div>
-              )}
-              {/* if automatic lookup yielded an error, show it inline */}
-              {verificationError && (
-                <div style={{
-                  marginTop: '8px',
-                  padding: '10px 14px',
-                  background: 'rgba(255, 77, 106, 0.1)',
-                  border: '1px solid rgba(255, 77, 106, 0.2)',
-                  borderRadius: '12px',
-                  fontSize: '12px',
-                  color: '#FF4D6A',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                }}>
-                  <span>⚠️</span>
-                  <span>{verificationError}</span>
-                </div>
-              )}
-              {/* always allow user to provide or adjust account name */}
-              <div style={{ marginTop: '12px' }}>
+               <div style={{ marginTop: '12px' }}>
                 <div style={{
                   fontSize: '13px',
                   fontWeight: 600,
@@ -1171,7 +1050,6 @@ export const WithdrawPage = () => {
                   value={form.account_name}
                   onChange={(e) => {
                     setForm(prev => ({ ...prev, account_name: e.target.value }));
-                    setVerifiedName(''); // clear auto name when user edits
                   }}
                   placeholder="Enter account holder name"
                   style={{

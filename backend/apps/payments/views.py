@@ -124,9 +124,9 @@ def transfer_referral_to_main(request):
     amount_usdt = Decimal(str(request.data.get('amount_usdt', 0)))
     
     # Validation
-    if amount_usdt < Decimal('5.00'):
+    if amount_usdt < Decimal('10.00'):
         return Response(
-            {'detail': 'Minimum transfer is $5 USDT'},
+            {'detail': 'Minimum transfer is $10 USDT'},
             status=status.HTTP_400_BAD_REQUEST
         )
     
@@ -343,7 +343,7 @@ def pay_withdrawal_fee(request):
     )
     
     return Response({
-        'message': 'Withdrawal fee payment submitted! Awaiting admin approval.',
+        'message': 'Withdrawal fee payment submitted! Awaiting approval.',
         'payment_id': str(payment.id),
         'fee_amount': float(fee_amount)
     }, status=status.HTTP_201_CREATED)
