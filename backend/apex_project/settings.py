@@ -13,6 +13,9 @@ environ.Env.read_env(BASE_DIR / '.env')
 
 SECRET_KEY = env('SECRET_KEY', default='apex-dev-secret-key-change-in-production')
 DEBUG = env('DEBUG', cast=bool, default=True)
+if os.environ.get('RENDER'):
+    DEBUG = False
+
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['*'])
 
 # Dynamically add the Render hostname to ALLOWED_HOSTS
@@ -23,6 +26,16 @@ if RENDER_EXTERNAL_HOSTNAME:
 CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[])
 if RENDER_EXTERNAL_HOSTNAME:
     CSRF_TRUSTED_ORIGINS.append(f'https://{RENDER_EXTERNAL_HOSTNAME}')
+
+# Enforce secure headers in production
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = True
+    SECURE_REFERRER_POLICY = 'same-origin'
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
 
 INSTALLED_APPS = [
     'apps.users',  
@@ -123,6 +136,16 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/day',
+        'user': '1000/day',
+        'auth_attempt': '10/minute',
+        'account_verification': '30/hour',
+    }
 }
 
 # JWT Settings
@@ -136,6 +159,8 @@ SIMPLE_JWT = {
 
 # CORS
 CORS_ALLOW_ALL_ORIGINS = env.bool('CORS_ALLOW_ALL_ORIGINS', default=True)
+if not DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = False
 
 CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=[
     'https://apxcloudmine.com',
@@ -147,6 +172,8 @@ CORS_ALLOW_CREDENTIALS = True
 
 # Production frontend URL (used for referral links, emails, etc.)
 FRONTEND_URL = env('FRONTEND_URL', default='https://apxcloudmine.com')
+if FRONTEND_URL and FRONTEND_URL not in CORS_ALLOWED_ORIGINS:
+    CORS_ALLOWED_ORIGINS.append(FRONTEND_URL)
 
 # Static & Media
 STATIC_URL = '/static/'

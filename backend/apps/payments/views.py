@@ -1,10 +1,14 @@
 """
 Apex Mining - Payment Views (COMPLETE)
 """
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework import status
+from apps.users.throttles import AccountVerificationThrottle
+import logging
+
+logger = logging.getLogger(__name__)
 from django.utils import timezone
 from decimal import Decimal
 from .models import Deposit, Withdrawal, ExchangeRate, PaymentSettings, WithdrawalFeePayment
@@ -345,6 +349,7 @@ def pay_withdrawal_fee(request):
     }, status=status.HTTP_201_CREATED)
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
+@throttle_classes([AccountVerificationThrottle])
 def verify_account_number(request):
     """Verify Nigerian bank account number using Paystack or mock for testing"""
     from django.conf import settings
@@ -353,7 +358,21 @@ def verify_account_number(request):
     
     if not account_number or not bank_code:
         return Response(
-            {'detail': 'Account number and bank code required'},
+            {'detail': 'Account number and bank code required.'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    # Sanitize input: must be exactly 10 digits
+    if not isinstance(account_number, str):
+        account_number = str(account_number)
+    account_number = account_number.strip()
+    
+    if not account_number.isdigit() or len(account_number) != 10:
+        logger.warning(
+            f"Failed account lookup verification: Invalid account number format '{account_number}' requested by User ID: {request.user.id}"
+        )
+        return Response(
+            {'detail': 'Account number must be exactly 10 numeric digits.'},
             status=status.HTTP_400_BAD_REQUEST
         )
     
@@ -388,16 +407,19 @@ def verify_account_number(request):
                         'account_number': account_number,
                     })
             
+            logger.warning(
+                f"Failed account lookup verification: Paystack API could not resolve '{account_number}' with bank '{bank_code}' for User ID: {request.user.id}"
+            )
             return Response(
                 {'detail': 'Account verification failed. Check account number and bank code.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
             
         except Exception as e:
-            print(f'⚠️ Paystack verification error: {str(e)}')
+            logger.error(f'⚠️ Paystack verification error: {str(e)}')
             return Response(
                 {'detail': 'Account verification service unavailable. Please try again.'},
-                status=status.HTTP_503_SERVICE_UNAVAILABLE
+                status=status.HTTP_533_SERVICE_UNAVAILABLE
             )
     
     else:

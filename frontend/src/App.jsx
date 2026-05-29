@@ -50,6 +50,40 @@ const Protected = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
 
+  // Show a premium loading screen while user is fetching
+  if (token && !user) {
+    return (
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        background: '#040d1a',
+        color: '#fff',
+        fontFamily: "'DM Sans', sans-serif"
+      }}>
+        <div style={{
+          width: '40px',
+          height: '40px',
+          border: '3px solid rgba(26, 111, 255, 0.1)',
+          borderTopColor: '#1a6fff',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite',
+          marginBottom: '16px'
+        }} />
+        <style>{`
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
+        <span style={{ fontSize: '13px', color: '#7c90b6', fontWeight: 500, letterSpacing: '0.5px' }}>
+          Establishing secure session...
+        </span>
+      </div>
+    );
+  }
+
   // Telegram Gate check
   if (user && !user.joined_telegram && window.location.pathname !== '/join-telegram') {
     return <Navigate to="/join-telegram" replace />;

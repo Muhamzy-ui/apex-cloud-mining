@@ -20,17 +20,48 @@ export const TelegramGatePage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [telegramUrl, setTelegramUrl] = useState('https://t.me/apexcloudmining');
+  const [countdown, setCountdown] = useState(5);
+  const [popupBlocked, setPopupBlocked] = useState(false);
 
-  // Load telegram URL from admin settings
+  // Load telegram URL from admin settings and attempt to auto-open
   useEffect(() => {
     api.get('/payments/settings/').then(res => {
       const url = res.data?.telegram_gate_url || res.data?.telegram_community_url;
+      const targetUrl = url || telegramUrl;
       if (url) setTelegramUrl(url);
-    }).catch(() => {});
+      
+      // Auto-open telegram group
+      try {
+        const popup = window.open(targetUrl, '_blank');
+        if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+          setPopupBlocked(true);
+        }
+      } catch (e) {
+        setPopupBlocked(true);
+      }
+    }).catch(() => {
+      // Fallback auto-open with default URL
+      try {
+        const popup = window.open(telegramUrl, '_blank');
+        if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+          setPopupBlocked(true);
+        }
+      } catch (e) {
+        setPopupBlocked(true);
+      }
+    });
   }, []);
 
+  // Countdown timer effect
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(c => c - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [countdown]);
+
   const handleJoin = async () => {
-    // Open Telegram in a new tab immediately so it isn't blocked by popup blockers
+    // Open Telegram in a new tab
     window.open(telegramUrl, '_blank');
     
     setLoading(true);
@@ -41,6 +72,19 @@ export const TelegramGatePage = () => {
       navigate('/dashboard');
     } catch (error) {
       toast.error('Failed to verify. Please try again.');
+      setLoading(false);
+    }
+  };
+
+  const handleSkip = async () => {
+    setLoading(true);
+    try {
+      await api.post('/auth/mark-telegram-joined/');
+      await refreshUser();
+      toast.success('Redirecting to dashboard...');
+      navigate('/dashboard');
+    } catch (error) {
+      toast.error('Failed to skip. Please try again.');
       setLoading(false);
     }
   };
@@ -65,6 +109,25 @@ export const TelegramGatePage = () => {
           To access your dashboard and start earning, you must join our official Telegram channel for updates, support, and announcements.
         </p>
 
+        {popupBlocked && (
+          <div style={{
+            background: 'rgba(255, 77, 106, 0.1)',
+            border: '1px solid rgba(255, 77, 106, 0.2)',
+            borderRadius: '12px',
+            padding: '10px 14px',
+            fontSize: '12px',
+            color: '#FF4D6A',
+            marginBottom: '20px',
+            textAlign: 'left',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}>
+            <span>⚠️</span>
+            <span>Popup blocked. Please click the button below to open Telegram manually.</span>
+          </div>
+        )}
+
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <button 
             onClick={handleJoin}
@@ -87,6 +150,29 @@ export const TelegramGatePage = () => {
             }}
           >
             {loading ? 'Processing...' : 'Join Telegram Channel'}
+          </button>
+
+          <button 
+            onClick={handleSkip}
+            disabled={countdown > 0 || loading}
+            style={{
+              width: '100%',
+              padding: '14px',
+              background: 'transparent',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '12px',
+              color: countdown > 0 ? 'var(--apex-muted)' : '#fff',
+              fontSize: '14px',
+              fontWeight: 600,
+              cursor: (countdown > 0 || loading) ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: (countdown > 0 || loading) ? 0.5 : 1,
+              transition: 'all 0.2s ease',
+            }}
+          >
+            {countdown > 0 ? `Skip in ${countdown}s...` : 'Skip'}
           </button>
         </div>
       </div>

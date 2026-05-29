@@ -2,8 +2,9 @@
 Apex Mining - User Views (COMPLETE)
 """
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from .throttles import AuthAttemptThrottle
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 import random
@@ -16,6 +17,7 @@ from .utils import send_verification_email, send_password_reset_email
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([AuthAttemptThrottle])
 def register(request):
     """Register new user (Requires Email Verification)"""
     serializer = RegisterSerializer(data=request.data)
@@ -44,6 +46,7 @@ def register(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([AuthAttemptThrottle])
 def login(request):
     """Login user"""
     email = request.data.get('email', '').strip().lower()
@@ -92,6 +95,7 @@ def login(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([AuthAttemptThrottle])
 def verify_email(request):
     """Verify email with 6-digit code"""
     email = request.data.get('email', '').strip().lower()
@@ -164,6 +168,7 @@ def verify_email(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([AuthAttemptThrottle])
 def resend_verification(request):
     """Resend 6-digit verification code"""
     email = request.data.get('email', '').strip().lower()
@@ -194,6 +199,7 @@ def resend_verification(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([AuthAttemptThrottle])
 def request_password_reset(request):
     """Request a password reset code"""
     email = request.data.get('email', '').strip().lower()
@@ -222,6 +228,7 @@ def request_password_reset(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([AuthAttemptThrottle])
 def confirm_password_reset(request):
     """Confirm password reset with code and set new password"""
     email = request.data.get('email', '').strip().lower()

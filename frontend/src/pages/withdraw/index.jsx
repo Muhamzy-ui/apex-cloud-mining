@@ -208,6 +208,7 @@ export const WithdrawPage = () => {
   const [selectedBank, setSelectedBank] = useState(null);
   const [verifying, setVerifying] = useState(false);
   const [verifiedName, setVerifiedName] = useState('');
+  const [verificationError, setVerificationError] = useState('');
   const [showBankDropdown, setShowBankDropdown] = useState(false);
   const [planTransferFeeUsdt, setPlanTransferFeeUsdt] = useState(0);
   const [exchangeRate, setExchangeRate] = useState(1600);
@@ -314,6 +315,7 @@ export const WithdrawPage = () => {
     const verifyAccount = async () => {
       if (selectedBank && form.account_number.length === 10) {
         setVerifying(true);
+        setVerificationError('');
         try {
           const token = localStorage.getItem('access_token');
           const response = await axios.post(
@@ -328,15 +330,17 @@ export const WithdrawPage = () => {
           );
           setVerifiedName(response.data.account_name);
           setForm(prev => ({ ...prev, account_name: response.data.account_name }));
+          setVerificationError('');
         } catch (err) {
           console.error('Verification failed:', err);
           setVerifiedName('');
-          toast.error('Could not verify account. Please check and try again.');
+          setVerificationError(err.response?.data?.detail || 'Could not verify account. Check details.');
         } finally {
           setVerifying(false);
         }
       } else {
         setVerifiedName('');
+        setVerificationError('');
       }
     };
 
@@ -942,6 +946,7 @@ export const WithdrawPage = () => {
                       setSelectedBank(null);
                       setBankSearch('');
                       setVerifiedName('');
+                      setVerificationError('');
                       setForm(prev => ({ ...prev, bank_name: '', account_name: '', account_number: '' }));
                     }}
                     style={{
@@ -990,6 +995,7 @@ export const WithdrawPage = () => {
                           setSelectedBank(bank);
                           setBankSearch(bank.name);
                           setForm(prev => ({ ...prev, bank_name: bank.name }));
+                          setVerificationError('');
                           setShowBankDropdown(false);
                         }}
                         style={{
@@ -1032,7 +1038,7 @@ export const WithdrawPage = () => {
                 padding: '16px',
                 background: selectedBank ? 'var(--apex-navy)' : 'rgba(26, 111, 255, 0.05)',
                 borderRadius: '14px',
-                border: `1px solid ${selectedBank ? 'var(--apex-border)' : 'rgba(255, 77, 106, 0.3)'}`,
+                border: `1px solid ${verificationError ? '#FF4D6A' : selectedBank ? 'var(--apex-border)' : 'rgba(255, 77, 106, 0.3)'}`,
                 opacity: selectedBank ? 1 : 0.6,
               }}>
                 <div style={{
@@ -1060,6 +1066,7 @@ export const WithdrawPage = () => {
                     setForm(prev => ({ ...prev, account_number: value }));
                     if (value.length !== 10) {
                       setVerifiedName('');
+                      setVerificationError('');
                     }
                   }}
                   placeholder={selectedBank ? "Enter 10-digit account number" : "Select a bank first"}
@@ -1131,14 +1138,22 @@ export const WithdrawPage = () => {
                   </div>
                 </div>
               )}
-              {/* if automatic lookup didn't yield a name, show hint */}
-              {selectedBank && form.account_number.length === 10 && !verifying && !verifiedName && (
+              {/* if automatic lookup yielded an error, show it inline */}
+              {verificationError && (
                 <div style={{
                   marginTop: '8px',
+                  padding: '10px 14px',
+                  background: 'rgba(255, 77, 106, 0.1)',
+                  border: '1px solid rgba(255, 77, 106, 0.2)',
+                  borderRadius: '12px',
                   fontSize: '12px',
-                  color: 'var(--apex-red)',
+                  color: '#FF4D6A',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
                 }}>
-                  Couldn’t verify automatically? Enter the account holder’s name below.
+                  <span>⚠️</span>
+                  <span>{verificationError}</span>
                 </div>
               )}
               {/* always allow user to provide or adjust account name */}
