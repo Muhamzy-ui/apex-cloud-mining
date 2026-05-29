@@ -198,8 +198,13 @@ APEX_USD_TO_GHS_RATE = 15.5
 PAYSTACK_SECRET_KEY = env('PAYSTACK_SECRET_KEY', default=None)
 
 # Resend Email Settings
+# Using onboarding@resend.dev works immediately (no domain verification needed)
+# To use your own domain (e.g. noreply@apxcloudmine.com):
+#   1. Go to https://resend.com/domains
+#   2. Add 'apxcloudmine.com' and follow the DNS verification steps
+#   3. Then set EMAIL_FROM=Apex Mining <noreply@apxcloudmine.com> in Render env vars
 RESEND_API_KEY = env('RESEND_API_KEY', default=None)
-EMAIL_FROM = env('EMAIL_FROM', default='apex-mining <no-reply@apex-mining.com>')
+EMAIL_FROM = env('EMAIL_FROM', default='Apex Mining <onboarding@resend.dev>')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LANGUAGE_CODE = 'en-us'
