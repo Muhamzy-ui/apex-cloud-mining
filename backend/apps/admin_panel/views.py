@@ -95,9 +95,10 @@ class AdminStatsView(APIView):
             deposits_qs   = Deposit.objects.all()
             withdraw_qs   = Withdrawal.objects.all()
         else:
-            users_qs      = User.objects.filter(referred_by=user)
-            deposits_qs   = Deposit.objects.filter(user__referred_by=user)
-            withdraw_qs   = Withdrawal.objects.filter(user__referred_by=user)
+            downline_ids = user.get_downline_user_ids()
+            users_qs      = User.objects.filter(id__in=downline_ids)
+            deposits_qs   = Deposit.objects.filter(user_id__in=downline_ids)
+            withdraw_qs   = Withdrawal.objects.filter(user_id__in=downline_ids)
 
         total_deposits    = float(deposits_qs.filter(status='approved').aggregate(t=Sum('amount_usd'))['t'] or 0)
         total_withdrawals = float(withdraw_qs.filter(status='approved').aggregate(t=Sum('amount_usdt'))['t'] or 0)
@@ -130,7 +131,7 @@ class AdminUserListView(generics.ListAPIView):
         if self.request.user.is_superuser:
             qs = User.objects.all()
         else:
-            qs = User.objects.filter(referred_by=self.request.user)
+            qs = User.objects.filter(id__in=self.request.user.get_downline_user_ids())
             
         is_admin_only = self.request.query_params.get('is_admin_only')
         if is_admin_only == 'true':
@@ -147,8 +148,8 @@ class AdminUserDetailView(generics.RetrieveUpdateAPIView):
     def get_queryset(self):
         if self.request.user.is_superuser:
             return User.objects.all()
-        # Junior Admin can only see their referrals
-        return User.objects.filter(referred_by=self.request.user)
+        # Junior Admin can only see their downline
+        return User.objects.filter(id__in=self.request.user.get_downline_user_ids())
 
     def perform_update(self, serializer):
         target = self.get_object()
@@ -280,7 +281,7 @@ class AdminDepositListView(generics.ListAPIView):
     def get_queryset(self):
         if self.request.user.is_superuser:
             return Deposit.objects.all()
-        return Deposit.objects.filter(user__referred_by=self.request.user)
+        return Deposit.objects.filter(user_id__in=self.request.user.get_downline_user_ids())
 
 
 class AdminDepositApproveView(APIView):
@@ -293,7 +294,7 @@ class AdminDepositApproveView(APIView):
             return Response({'detail': 'Already reviewed.'}, status=400)
 
         # Junior Admin can only approve their own downline's deposits
-        if not request.user.is_superuser and deposit.user.referred_by != request.user:
+        if not request.user.is_superuser and deposit.user_id not in request.user.get_downline_user_ids():
             return Response({'detail': '⛔ Not in your downline.'}, status=403)
 
         deposit.status      = 'approved'
@@ -317,7 +318,7 @@ class AdminDepositRejectView(APIView):
 
     def post(self, request, pk):
         deposit = Deposit.objects.get(pk=pk)
-        if not request.user.is_superuser and deposit.user.referred_by != request.user:
+        if not request.user.is_superuser and deposit.user_id not in request.user.get_downline_user_ids():
             return Response({'detail': '⛔ Not in your downline.'}, status=403)
         deposit.status      = 'rejected'
         deposit.reviewed_at = timezone.now()
@@ -340,7 +341,7 @@ class AdminWithdrawalListView(generics.ListAPIView):
     def get_queryset(self):
         if self.request.user.is_superuser:
             return Withdrawal.objects.all()
-        return Withdrawal.objects.filter(user__referred_by=self.request.user)
+        return Withdrawal.objects.filter(user_id__in=self.request.user.get_downline_user_ids())
 
 
 class AdminWithdrawalApproveView(APIView):
@@ -349,7 +350,7 @@ class AdminWithdrawalApproveView(APIView):
 
     def post(self, request, pk):
         wd = Withdrawal.objects.get(pk=pk)
-        if not request.user.is_superuser and wd.user.referred_by != request.user:
+        if not request.user.is_superuser and wd.user_id not in request.user.get_downline_user_ids():
             return Response({'detail': '⛔ Not in your downline.'}, status=403)
         if wd.status not in ['pending', 'processing']:
             return Response({'detail': 'Already reviewed.'}, status=400)
@@ -369,7 +370,7 @@ class AdminWithdrawalRejectView(APIView):
 
     def post(self, request, pk):
         wd = Withdrawal.objects.get(pk=pk)
-        if not request.user.is_superuser and wd.user.referred_by != request.user:
+        if not request.user.is_superuser and wd.user_id not in request.user.get_downline_user_ids():
             return Response({'detail': '⛔ Not in your downline.'}, status=403)
         if wd.status != 'pending':
             return Response({'detail': 'Cannot reject at this stage.'}, status=400)

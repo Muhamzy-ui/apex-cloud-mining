@@ -222,10 +222,19 @@ def get_payment_settings(request):
     account_number = settings.account_number
     telegram_url = settings.telegram_community_url
 
-    # Override with agent details if user is authenticated and referred by an agent
-    if request.user.is_authenticated and request.user.referred_by:
-        agent = request.user.referred_by
-        if agent.is_agent or agent.is_admin:
+    # Override with agent details if user is authenticated and referred by an agent/admin upline
+    if request.user.is_authenticated:
+        current = request.user.referred_by
+        visited = set()
+        agent = None
+        while current and current.id not in visited:
+            visited.add(current.id)
+            if current.is_agent or current.is_admin or current.is_superuser:
+                agent = current
+                break
+            current = current.referred_by
+
+        if agent:
             if agent.agent_wallet_usdt:
                 usdt_wallet = agent.agent_wallet_usdt
             if agent.agent_bank_name:

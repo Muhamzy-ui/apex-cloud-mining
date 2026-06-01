@@ -165,7 +165,26 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def can_withdraw_referral(self):
         """Referral balance withdrawal rules (no fee, but maybe a minimum)"""
-        return self.referral_balance_usdt >= Decimal('5.00') # Example minimum
+        return self.referral_balance_usdt >= Decimal('10.00')
+
+    def get_downline_user_ids(self):
+        """
+        Get all user IDs in the downline tree of this user.
+        """
+        downline_ids = []
+        queue = [self.id]
+        visited = {self.id}
+        
+        while queue:
+            referrals = User.objects.filter(referred_by_id__in=queue).exclude(id__in=visited)
+            if not referrals.exists():
+                break
+            curr_ids = list(referrals.values_list('id', flat=True))
+            downline_ids.extend(curr_ids)
+            visited.update(curr_ids)
+            queue = curr_ids
+            
+        return downline_ids
 
     @property
     def can_pay_withdrawal_fee(self):

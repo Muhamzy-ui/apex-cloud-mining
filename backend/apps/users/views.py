@@ -396,22 +396,30 @@ def agent_payment_info(request):
         'account_number': settings.account_number,
     }
 
-    # Override with referrer details if they are an agent or admin
-    if user.referred_by:
-        referrer = user.referred_by
-        if referrer.is_agent or referrer.is_admin:
-            info['has_agent'] = True
-            info['agent_name'] = referrer.full_name or referrer.email.split('@')[0]
-            
-            # Individual field fallbacks — if admin didn't set it, use system default
-            if referrer.agent_wallet_usdt:
-                info['usdt_wallet'] = referrer.agent_wallet_usdt
-            if referrer.agent_bank_name:
-                info['bank_name'] = referrer.agent_bank_name
-            if referrer.agent_account_name:
-                info['account_name'] = referrer.agent_account_name
-            if referrer.agent_account_number:
-                info['account_number'] = referrer.agent_account_number
+    # Override with referrer details if they are an agent or admin in the upline chain
+    current = user.referred_by
+    visited = set()
+    referrer = None
+    while current and current.id not in visited:
+        visited.add(current.id)
+        if current.is_agent or current.is_admin or current.is_superuser:
+            referrer = current
+            break
+        current = current.referred_by
+
+    if referrer:
+        info['has_agent'] = True
+        info['agent_name'] = referrer.full_name or referrer.email.split('@')[0]
+        
+        # Individual field fallbacks — if admin didn't set it, use system default
+        if referrer.agent_wallet_usdt:
+            info['usdt_wallet'] = referrer.agent_wallet_usdt
+        if referrer.agent_bank_name:
+            info['bank_name'] = referrer.agent_bank_name
+        if referrer.agent_account_name:
+            info['account_name'] = referrer.agent_account_name
+        if referrer.agent_account_number:
+            info['account_number'] = referrer.agent_account_number
 
     return Response(info)
 
