@@ -226,7 +226,7 @@ export const WithdrawFeePage = () => {
             fontSize: '13px',
             color: 'var(--apex-muted)',
           }}>
-            ≈ ₦{(feeAmount * 1600).toLocaleString()} NGN
+            ≈ ₦{(feeAmount * 1400).toLocaleString()} NGN
           </div>
         </div>
 

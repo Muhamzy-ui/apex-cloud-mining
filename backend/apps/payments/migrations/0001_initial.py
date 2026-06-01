@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
             name='ExchangeRate',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('usd_to_ngn', models.DecimalField(decimal_places=2, default=1600, max_digits=10)),
+                ('usd_to_ngn', models.DecimalField(decimal_places=2, default=1400, max_digits=10)),
                 ('usd_to_ghs', models.DecimalField(decimal_places=2, default=15.5, max_digits=10)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
             ],

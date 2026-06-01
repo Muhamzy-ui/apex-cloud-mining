@@ -681,4 +681,4 @@ def get_exchange_rate(request):
     except Exception:
         pass
     # Fallback default
-    return Response({'usd_to_ngn': 1600, 'usd_to_ghs': 15.5})
+    return Response({'usd_to_ngn': 1400, 'usd_to_ghs': 15.5})

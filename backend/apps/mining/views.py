@@ -20,7 +20,7 @@ EARN_PER_DAY = {
     5: Decimal('699.00'),
 }
 
-NGN_RATE = 1600  # 1 USDT = 1600 NGN
+NGN_RATE = 1400  # 1 USDT = 1400 NGN
 
 
 @api_view(['POST'])

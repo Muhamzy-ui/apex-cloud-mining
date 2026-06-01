@@ -208,7 +208,7 @@ export const WithdrawPage = () => {
   const [selectedBank, setSelectedBank] = useState(null);
   const [showBankDropdown, setShowBankDropdown] = useState(false);
   const [planTransferFeeUsdt, setPlanTransferFeeUsdt] = useState(0);
-  const [exchangeRate, setExchangeRate] = useState(1600);
+  const [exchangeRate, setExchangeRate] = useState(1400);
 
   // Form state
   const [form, setForm] = useState({
@@ -280,9 +280,9 @@ export const WithdrawPage = () => {
     const fetchRate = async () => {
       try {
         const response = await axios.get(`${API_URL}/payments/exchange-rate/`);
-        setExchangeRate(parseFloat(response.data?.usd_to_ngn || 1600));
+        setExchangeRate(parseFloat(response.data?.usd_to_ngn || 1400));
       } catch (err) {
-        setExchangeRate(1600);
+        setExchangeRate(1400);
       }
     };
     fetchPlanFee();

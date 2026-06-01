@@ -103,7 +103,7 @@ class Withdrawal(models.Model):
 class ExchangeRate(models.Model):
     """Exchange rates (admin controlled)"""
     
-    usd_to_ngn = models.DecimalField(max_digits=10, decimal_places=2, default=1600)
+    usd_to_ngn = models.DecimalField(max_digits=10, decimal_places=2, default=1400)
     usd_to_ghs = models.DecimalField(max_digits=10, decimal_places=2, default=15.5)
     updated_at = models.DateTimeField(auto_now=True)
     updated_by = models.ForeignKey(
