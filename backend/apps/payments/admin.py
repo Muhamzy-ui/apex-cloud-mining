@@ -15,9 +15,22 @@ class DepositAdmin(admin.ModelAdmin):
     list_display = ['user_email', 'tier_target', 'amount_display', 'method', 'status', 'created_at']
     list_filter = ['status', 'method', 'tier_target', 'created_at']
     search_fields = ['user__email', 'user__full_name']
-    readonly_fields = ['id', 'user', 'tier_target', 'amount_usd', 'amount_ngn', 'method', 'proof_image', 'tx_hash', 'status', 'created_at']
+    readonly_fields = ['id', 'user', 'tier_target', 'amount_usd', 'amount_ngn', 'method', 'view_proof', 'tx_hash', 'status', 'created_at']
+    fields = ['id', 'user', 'tier_target', 'amount_usd', 'amount_ngn', 'method', 'view_proof', 'tx_hash', 'status', 'created_at']
     actions = ['approve_deposits', 'reject_deposits']
     ordering = ['-created_at']
+
+    def view_proof(self, obj):
+        if obj.proof_image:
+            return format_html(
+                '<a href="{0}" target="_blank">'
+                '<img src="{0}" style="max-width: 450px; max-height: 450px; border-radius: 12px; border: 1px solid #ccc; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />'
+                '</a>',
+                obj.proof_image.url
+            )
+        return "No proof uploaded"
+    view_proof.short_description = "Proof of Payment (Click to Open)"
+
     
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -484,9 +497,22 @@ class WithdrawalFeePaymentAdmin(admin.ModelAdmin):
     list_display = ['user_email', 'tier', 'fee_display', 'method', 'status', 'created_at']
     list_filter = ['status', 'tier', 'method', 'created_at']
     search_fields = ['user__email']
-    readonly_fields = ['id', 'user', 'tier', 'fee_amount_usd', 'method', 'proof_image', 'tx_hash', 'created_at']
+    readonly_fields = ['id', 'user', 'tier', 'fee_amount_usd', 'method', 'view_proof', 'tx_hash', 'created_at']
+    fields = ['id', 'user', 'tier', 'fee_amount_usd', 'method', 'view_proof', 'tx_hash', 'status', 'created_at']
     actions = ['approve_fee_payments', 'reject_fee_payments']
     ordering = ['-created_at']
+
+    def view_proof(self, obj):
+        if obj.proof_image:
+            return format_html(
+                '<a href="{0}" target="_blank">'
+                '<img src="{0}" style="max-width: 450px; max-height: 450px; border-radius: 12px; border: 1px solid #ccc; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />'
+                '</a>',
+                obj.proof_image.url
+            )
+        return "No proof uploaded"
+    view_proof.short_description = "Proof of Payment (Click to Open)"
+
     
     def get_queryset(self, request):
         qs = super().get_queryset(request)
