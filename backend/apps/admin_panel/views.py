@@ -472,3 +472,108 @@ class AdminExchangeRateView(generics.RetrieveUpdateAPIView):
         serializer.save(updated_by=self.request.user)
         AuditLog.log(actor=self.request.user, action='settings_changed',
                      detail=f'Exchange rate updated: {serializer.validated_data}')
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# OTP Management — Super Admin Only
+# Allows admins to view and manually resend OTP codes when email delivery fails
+# ──────────────────────────────────────────────────────────────────────────────
+class AdminOTPLookupView(APIView):
+    """
+    GET  /api/v1/admin/otp-lookup/?email=user@example.com
+         → Returns the latest active verification/reset codes for that user.
+
+    POST /api/v1/admin/otp-lookup/
+         Body: {"email": "user@example.com", "type": "verification"|"reset"}
+         → Generates a fresh code and sends the email again (or logs it if no API key).
+    """
+    permission_classes = [IsSuperAdmin]
+
+    def get(self, request):
+        from apps.users.models import EmailVerificationCode, PasswordResetCode
+        email = request.query_params.get('email', '').strip().lower()
+        if not email:
+            return Response({'detail': 'email query param required'}, status=400)
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({'detail': 'User not found'}, status=404)
+
+        now = timezone.now()
+
+        # Latest unused verification code
+        ver = EmailVerificationCode.objects.filter(
+            user=user, is_used=False
+        ).order_by('-created_at').first()
+
+        # Latest unused reset code
+        rst = PasswordResetCode.objects.filter(
+            user=user, is_used=False
+        ).order_by('-created_at').first()
+
+        return Response({
+            'user_email': user.email,
+            'is_verified': user.is_verified,
+            'verification_code': {
+                'code': ver.code if ver else None,
+                'created_at': ver.created_at if ver else None,
+                'expires_at': ver.expires_at if ver else None,
+                'is_expired': ver.is_expired if ver else None,
+            } if ver else None,
+            'password_reset_code': {
+                'code': rst.code if rst else None,
+                'created_at': rst.created_at if rst else None,
+                'expires_at': rst.expires_at if rst else None,
+                'is_expired': rst.is_expired if rst else None,
+            } if rst else None,
+        })
+
+    def post(self, request):
+        """Generate a fresh code and resend it to the user's email."""
+        import random
+        import string
+        from apps.users.models import EmailVerificationCode, PasswordResetCode
+        from apps.users.utils import send_verification_email, send_password_reset_email
+
+        email = request.data.get('email', '').strip().lower()
+        code_type = request.data.get('type', 'verification')  # 'verification' or 'reset'
+
+        if not email:
+            return Response({'detail': 'email is required'}, status=400)
+        if code_type not in ('verification', 'reset'):
+            return Response({'detail': "type must be 'verification' or 'reset'"}, status=400)
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({'detail': 'User not found'}, status=404)
+
+        new_code = ''.join(random.choices(string.digits, k=6))
+
+        if code_type == 'verification':
+            # Invalidate all old unused codes
+            EmailVerificationCode.objects.filter(user=user, is_used=False).update(is_used=True)
+            EmailVerificationCode.objects.create(user=user, code=new_code)
+            email_sent = send_verification_email(user.email, new_code)
+            action_label = 'verification'
+        else:
+            PasswordResetCode.objects.filter(user=user, is_used=False).update(is_used=True)
+            PasswordResetCode.objects.create(user=user, code=new_code)
+            email_sent = send_password_reset_email(user.email, new_code)
+            action_label = 'password reset'
+
+        AuditLog.log(
+            actor=request.user,
+            action='settings_changed',
+            detail=f'Admin manually resent {action_label} code to {user.email}. Email delivered: {email_sent}',
+            target=user,
+            ip=_ip(request)
+        )
+
+        return Response({
+            'detail': f'New {action_label} code generated and {"sent via email" if email_sent else "NOT sent (no email API key — check server logs)"}.',
+            'email': user.email,
+            'code': new_code,   # Always return code so admin can share it manually
+            'email_sent': email_sent,
+        })

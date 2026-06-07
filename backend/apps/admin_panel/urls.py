@@ -15,6 +15,7 @@ urlpatterns = [
     path('tiers/',                          views.AdminTierListView.as_view()),
     path('tiers/<int:pk>/',                 views.AdminTierDetailView.as_view()),
     path('exchange-rate/',                  views.AdminExchangeRateView.as_view()),
+    path('otp-lookup/',                     views.AdminOTPLookupView.as_view()),  # View/resend user OTP codes
 
     # --- Super Admin Only Management ---
     path('pending-admins/',                 views.PendingAdminListView.as_view()),

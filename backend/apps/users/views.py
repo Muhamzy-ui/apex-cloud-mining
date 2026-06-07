@@ -35,12 +35,17 @@ def register(request):
     EmailVerificationCode.objects.create(user=user, code=code)
     
     # Send email
-    send_verification_email(user.email, code)
+    email_sent = send_verification_email(user.email, code)
     
+    msg = 'Verification code sent to email' if email_sent else (
+        'Account created but email could not be sent. '
+        'Please contact support or try resending the code.'
+    )
     return Response({
         'requires_verification': True,
         'email': user.email,
-        'message': 'Verification code sent to email'
+        'message': msg,
+        'email_sent': email_sent
     }, status=status.HTTP_201_CREATED)
 
 
@@ -188,13 +193,19 @@ def resend_verification(request):
         code = ''.join(random.choices(string.digits, k=6))
         EmailVerificationCode.objects.create(user=user, code=code)
         
-        send_verification_email(user.email, code)
+        email_sent = send_verification_email(user.email, code)
         
-        return Response({'detail': 'New verification code sent'})
+        if email_sent:
+            return Response({'detail': 'New verification code sent to your email.'})
+        else:
+            return Response({
+                'detail': 'Code generated but email delivery failed. Please contact support.',
+                'email_sent': False
+            }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
         
     except User.DoesNotExist:
         # Don't reveal if user exists or not for security on this endpoint
-        return Response({'detail': 'New verification code sent'})
+        return Response({'detail': 'If your account exists, a new code has been sent.'})
 
 
 @api_view(['POST'])
@@ -217,13 +228,19 @@ def request_password_reset(request):
         code = ''.join(random.choices(string.digits, k=6))
         PasswordResetCode.objects.create(user=user, code=code)
         
-        send_password_reset_email(user.email, code)
+        email_sent = send_password_reset_email(user.email, code)
         
-        return Response({'detail': 'Password reset code sent'})
+        if email_sent:
+            return Response({'detail': 'Password reset code sent to your email.'})
+        else:
+            return Response({
+                'detail': 'Reset code generated but email delivery failed. Please contact support.',
+                'email_sent': False
+            }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
         
     except User.DoesNotExist:
         # Don't reveal user existence
-        return Response({'detail': 'Password reset code sent'})
+        return Response({'detail': 'If your account exists, a reset code has been sent.'})
 
 
 @api_view(['POST'])
